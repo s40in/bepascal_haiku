@@ -1,0 +1,114 @@
+#   BePascal - A pascal wrapper around the BeOS API
+#    Copyright (C) 2002-2003 Olivier Coursiere                                        
+#                            Matt Emson
+#                            Eric Jourde                                              
+#                            Oscar Lesta
+#                                                                                
+#    This library is free software; you can redistribute it and/or               
+#    modify it under the terms of the GNU Library General Public                 
+#    License as published by the Free Software Foundation; either                
+#    version 2 of the License, or (at your option) any later version.            
+#                                                                                
+#    This library is distributed in the hope that it will be useful,             
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of              
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU           
+#    Library General Public License for more details.                            
+#                                                                                
+#    You should have received a copy of the GNU Library General Public           
+#    License along with this library; if not, write to the Free                  
+#    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA   
+
+SubDir BEPASCAL_TOP ;
+
+# Force creation of target's directories BEFORE the building of libbepascal.so
+Depends libbepascal.so : dirs ;
+
+# build libbepascal.so before libstubgen.so
+Depends libstubgen.so : libbepascal.so ;
+
+#LEAVES libbepascal.so ;
+#LEAVES libstubgen.so ;
+
+# set the distribution dir
+DISTRIB_DIR = distrib ;
+# Uncomment this line to setup BeOS install directory :
+#LIBBEPASCAL_INSTALL_DIR = /boot/home/config/lib ;
+# For Haiku :
+LIBBEPASCAL_INSTALL_DIR = /boot/home/config/non-packaged/lib ;
+
+# clean SEARCH var when building zip files. if not, some files are imported
+# from source/bepascal/cpp instead, maybe because of the Jam-engine.
+# example : Jamfile
+SEARCH on bin_bepascal.zip = . ;
+SEARCH on pas_sources.zip = . ;
+SEARCH on cpp_sources.zip = . ;
+SEARCH on demos.zip = . ;
+SEARCH on docs.zip = . ;
+
+rule MakeDistribs
+{
+	MkDir $(DISTRIB_DIR) ;
+	
+	# copy libbepascal.so in lib
+	Bulk lib : libbepascal.so libstubgen.so ;
+	# binary files like libbepascal.so are needed to build bin_bepascal.zip
+	Depends bin_bepascal.zip : libbepascal.so ;
+	# make all distribution files. We recursively add all files 
+	# in those directories except the ones in CVS or svn subdirectories
+	# We also add Jamfiles for building and installing the included
+	# sources
+	MakeZip bin_bepascal.zip :  Readme 
+	                            Jamfile 
+	                            Jamrules 
+	                            source/Jamfile 
+	                            source/bepascal/Jamfile
+	                            source/bepascal/cpp/Jamfile	                            
+	                            source/bepascal/pas 
+	                            lib ;
+	MakeZip pas_sources.zip : Readme 
+	                          Jamfile 
+	                          Jamrules 
+	                          source/bepascal/pas ;
+	MakeZip cpp_sources.zip : Readme 
+	                          Jamfile 
+	                          Jamrules 
+	                          source/bepascal/cpp ;
+	MakeZip demos.zip : Readme 
+	                    demos ;
+	MakeZip docs.zip : Readme 
+	                   docs ;
+	MakeZip bepascal_all.zip : Readme
+	                  Jamfile
+	                  Jamrules
+	                  demos
+	                  docs
+	                  lib
+                      source/Jamfile
+	                  source/bepascal/pas
+                      source/bepascal/Jamfile
+                      source/bepascal/cpp/Jamfile	                            
+	                  source/bepascal/cpp
+                      source/Jamfile 
+                      source/tools
+                      source/tools/Jamfile ;
+	                  	                   
+}
+
+NOTFILE zip ;
+ALWAYS zip ;
+
+rule zip
+{
+	# Make distribution files
+	Depends zip : libbepascal.so libstubgen.so ;
+	MakeDistribs ;
+}
+
+zip zip ;
+
+# Install libbepascal.so in LIBBEPASCAL_INSTALL_DIR (/boot/home/config/lib)
+InstallLib $(LIBBEPASCAL_INSTALL_DIR) : libbepascal.so ;
+InstallLib $(LIBBEPASCAL_INSTALL_DIR) : libstubgen.so ;
+
+
+SubInclude BEPASCAL_TOP source ;

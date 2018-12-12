@@ -1,0 +1,19 @@
+mydebugger
+
+This sample is not a debugger :-(. At least, not yet.
+
+The only usefull feature available is to trace syscalls (but strace is still the best tool for this job)
+
+This program is only written to discover the features of the built-in debugger API available in BeOS (and test our wrapper against this API). 
+
+This program is one of the first available source code that deal with those functions :-). 
+
+This API can save a lot of time when writting a debugger under BeOS. All the low level stuff is already done (setting breakpoint, writing or reading process memory, getting register's content...).
+
+In the futur, this sample can become a real debugger for FPC. Features needed to do this are :
+ - a better interface,
+ - a source browser
+ - and a way to find address of functions to set breakpoints (aka reading debug informations written by the fpc compiler in the binary). We only need to set them at the good address...
+
+TODO
+Writing some docs about this API (as there is nothing about this in the BeBook)

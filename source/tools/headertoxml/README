@@ -1,0 +1,4 @@
+This tool use libstubgen.so to parse C++ headers and generate 
+the corresponding XML description.
+
+This tool is part of the BeFPC poject.

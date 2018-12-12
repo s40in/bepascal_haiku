@@ -1,0 +1,7 @@
+libstubgen.so is a shared object that export the stubgen's parser.
+
+stubgen.pp in pas directory is the pascal unit to use this library.
+
+This code is based on the stubgen version found in OpenBeOS source tree.
+
+See COPYING and README file to find more informations about stubgen.

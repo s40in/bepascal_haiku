@@ -1,0 +1,8 @@
+### pe Group File
+./sources/button_view.pp
+./sources/common.pp
+./sources/edit_view.pp
+./sources/main.pp
+./sources/main_window.pp
+../BiPolar/TestApp/source/mainwindow.pas
+./sources/other_view.pp

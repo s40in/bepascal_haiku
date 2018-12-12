@@ -1,0 +1,8 @@
+#!/bin/sh
+if [ ! -d units ]
+  then mkdir units
+fi
+
+ppc386 -S2 -FE./ -FU./units ./sources/main.pp -oBPDemo -Fu../../source/bepascal/pas/src/be/* -g -gl
+mergeres ./sources/Resource.rsrc BPDemo
+mimeset BPDemo

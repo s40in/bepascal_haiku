@@ -1,0 +1,63 @@
+#   BePascal - A pascal wrapper around the BeOS API
+#    Copyright (C) 2002-2003 Olivier Coursiere                                        
+#                            Matt Emson
+#                            Eric Jourde                                              
+#                            Oscar Lesta
+#                                                                                
+#    This library is free software; you can redistribute it and/or               
+#    modify it under the terms of the GNU Library General Public                 
+#    License as published by the Free Software Foundation; either                
+#    version 2 of the License, or (at your option) any later version.            
+#                                                                                
+#    This library is distributed in the hope that it will be useful,             
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of              
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU           
+#    Library General Public License for more details.                            
+#                                                                                
+#    You should have received a copy of the GNU Library General Public           
+#    License along with this library; if not, write to the Free                  
+#    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA   
+
+REQUIREMENTS
+
+To use BePascal, you need :
+
+ - the free pascal compiler (fpc). Available at http://www.freepascal.org/down-beos.html.
+ - jam. Available at http://bebits.com/app/2981
+
+and this package !
+
+INSTALLATION
+
+Jam, fpc and ppc386 should be set in your /boot/home/config/bin.
+
+Then you will have to edit the .fpc.cfg file in /boot/home to add a path to bepascal files :
+
+  -Fu<path where you unzip bepascal_all.zip>source/bepascal/pas/src/be/*
+
+You can also add the -S2 option in your .fpc.cfg to be more "delphi friendly" and to avoid to give it at each command.
+
+When all is ready, you can make "jam" at the command line at the root of BePascal source tree.
+
+Then, you can install C/C++ library in /boot/home/config/lib using "jam install"
+
+OTHER OPTIONS
+
+You can make debug version of C/C++ libraries using ;
+
+jam -sDEBUGGER=TRUE
+
+HOW TO DEBUG ?
+
+Debugging is a difficult task with fpc as there is not yet a dedicated debugger under BeOS. With BePascal, you can use bdb to help debugging pascal programs. But it is far from perfect.
+
+First, you'll have to compile the pascal program to be debugged using -g option, and C/C++ libraries using jam -sDEBUGGER=TRUE.
+
+then, you can debug using
+
+bdb <your program>
+
+bdb will go to the first line of the main function, but pascal code will be only in assembler. But, C/C++ sources are available, and you can set break points there.
+
+
+
