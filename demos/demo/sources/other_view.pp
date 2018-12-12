@@ -29,7 +29,7 @@ uses
 type 
 	Tother_View = class(BView)
 	public
-   	constructor Create(aframe : BRect; name : PChar; aresizingMode, flags : Cardinal); 
+
 
  		Box1 : BBox;
  		Box2 : BBox;
@@ -38,6 +38,8 @@ type
    	Button2: BButton;    
    	Button3: BButton;    
    	Value : BStringView;
+
+   	constructor Create(aframe : BRect; name : PChar; aresizingMode, flags : Cardinal); 
   end;
 
 implementation

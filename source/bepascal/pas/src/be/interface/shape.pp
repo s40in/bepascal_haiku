@@ -54,7 +54,6 @@ type
     function LineTo(linePoint : BPoint) : Status_t;
     function BezierTo(controlPoints : BPoint) : Status_t;
     function Close : Status_t;
-//    function Perform(d : Perform_code; arg : Pointer) : Status_t;
   end;
 
 function BShapeIterator_Create(AObject : TBeObject):TCPlusObject; cdecl; external BePascalLibName name 'BShapeIterator_Create';
@@ -78,7 +77,6 @@ function BShape_MoveTo(AObject : TCPlusObject; point : TCPlusObject) : Status_t;
 function BShape_LineTo(AObject : TCPlusObject; linePoint : TCPlusObject) : Status_t; cdecl; external BePascalLibName name 'BShape_LineTo';
 function BShape_BezierTo(AObject : TCPlusObject; controlPoints : TCPlusObject) : Status_t; cdecl; external BePascalLibName name 'BShape_BezierTo';
 function BShape_Close(AObject : TCPlusObject) : Status_t; cdecl; external BePascalLibName name 'BShape_Close';
-//function BShape_Perform(AObject : TCPlusObject; d : Perform_code; arg : Pointer) : Status_t; cdecl; external BePascalLibName name 'BShape_Perform';
 
 implementation
 
@@ -188,11 +186,5 @@ function BShape.Close : Status_t;
 begin
   Result := BShape_Close(CPlusObject);
 end;
-
-{function BShape.Perform(d : Perform_code; arg : Pointer) : Status_t;
-begin
-  Result := BShape_Perform(CPlusObject, d, arg);
-end;
-}
 
 end.

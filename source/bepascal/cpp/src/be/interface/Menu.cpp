@@ -857,19 +857,6 @@ BMenu_GetSupportedSuites(BMenu *Menu, BMessage *data)
 
 
 /***********************************************************************
- *  Method: BMenu::Perform
- *  Params: perform_code d, void *arg
- * Returns: status_t
- * Effects: 
- ***********************************************************************/
-status_t
-BMenu_Perform(BMenu *Menu, perform_code d, void *arg)
-{
-   return Menu->Perform(d, arg);
-}
-
-
-/***********************************************************************
  *  Method: BMenu::MakeFocus
  *  Params: bool state
  * Returns: void

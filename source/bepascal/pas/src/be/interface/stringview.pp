@@ -51,7 +51,7 @@ type
     procedure AllAttached;override;
     procedure AllDetached;override;
     function GetSupportedSuites(data : BMessage) : Status_t;
-    function Perform(d : Perform_code; arg : Pointer) : Status_t;
+
 //    procedure _ReservedStringView1;
 //    procedure _ReservedStringView2;
 //    procedure _ReservedStringView3;
@@ -85,7 +85,6 @@ procedure BStringView_MakeFocus(AObject : TCPlusObject; state : boolean); cdecl;
 procedure BStringView_AllAttached(AObject : TCPlusObject); cdecl; external BePascalLibName name 'BStringView_AllAttached';
 procedure BStringView_AllDetached(AObject : TCPlusObject); cdecl; external BePascalLibName name 'BStringView_AllDetached';
 function BStringView_GetSupportedSuites(AObject : TCPlusObject; data : TCPlusObject) : Status_t; cdecl; external BePascalLibName name 'BStringView_GetSupportedSuites';
-function BStringView_Perform(AObject : TCPlusObject; d : Perform_code; arg : Pointer) : Status_t; cdecl; external BePascalLibName name 'BStringView_Perform';
 //procedure BStringView__ReservedStringView1(AObject : TCPlusObject); cdecl; external BePascalLibName name 'BStringView__ReservedStringView1';
 //procedure BStringView__ReservedStringView2(AObject : TCPlusObject); cdecl; external BePascalLibName name 'BStringView__ReservedStringView2';
 //procedure BStringView__ReservedStringView3(AObject : TCPlusObject); cdecl; external BePascalLibName name 'BStringView__ReservedStringView3';
@@ -218,10 +217,6 @@ begin
   Result := BStringView_GetSupportedSuites(CPlusObject, data.CPlusObject);
 end;
 
-function  BStringView.Perform(d : Perform_code; arg : Pointer) : Status_t;
-begin
-  //Result := BStringView_Perform(CPlusObject, d, arg);
-end;
 
 {procedure  BStringView._ReservedStringView1;
 begin

@@ -601,18 +601,6 @@ BOutlineListView_GetSupportedSuites(BOutlineListView *OutlineListView, BMessage 
 }
 
 
-/***********************************************************************
- *  Method: BOutlineListView::Perform
- *  Params: perform_code d, void *arg
- * Returns: status_t
- * Effects: 
- ***********************************************************************/
-status_t
-BOutlineListView_Perform(BOutlineListView *OutlineListView, perform_code d, void *arg)
-{
-   return OutlineListView->Perform(d, arg);
-}
-
 
 /***********************************************************************
  *  Method: BOutlineListView::ResizeToPreferred

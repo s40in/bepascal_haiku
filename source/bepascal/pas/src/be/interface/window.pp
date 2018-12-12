@@ -163,7 +163,6 @@ type
     function GetSupportedSuites(data : BMessage) : Status_t;
     function AddToSubset(window : BWindow) : Status_t;
     function RemoveFromSubset(window : BWindow) : Status_t;
-    function Perform(d : Perform_code; arg : Pointer) : Status_t;
     function SetType(aType : Cardinal) : Status_t;
     function GetType : Cardinal;
     function SetLook(look : PCardinal) : Status_t;
@@ -266,7 +265,6 @@ function BWindow_ResolveSpecifier(AObject : TCPlusObject; msg : TCPlusObject; in
 function BWindow_GetSupportedSuites(AObject : TCPlusObject; data : TCPlusObject) : Status_t; cdecl; external BePascalLibName name 'BWindow_GetSupportedSuites';
 function BWindow_AddToSubset(AObject : TCPlusObject; window : TCPlusObject) : Status_t; cdecl; external BePascalLibName name 'BWindow_AddToSubset';
 function BWindow_RemoveFromSubset(AObject : TCPlusObject; window : TCPlusObject) : Status_t; cdecl; external BePascalLibName name 'BWindow_RemoveFromSubset';
-function BWindow_Perform(AObject : TCPlusObject; d : Perform_code; arg : Pointer) : Status_t; cdecl; external BePascalLibName name 'BWindow_Perform';
 function BWindow_SetType(AObject : TCPlusObject; aType : Cardinal) : Status_t; cdecl; external BePascalLibName name 'BWindow_SetType';
 function BWindow_Type(AObject : TCPlusObject) : Cardinal; cdecl; external BePascalLibName name 'BWindow_Type';
 function BWindow_SetLook(AObject : TCPlusObject; look : PCardinal) : Status_t; cdecl; external BePascalLibName name 'BWindow_SetLook';
@@ -799,11 +797,6 @@ end;
 function BWindow.RemoveFromSubset(window : BWindow) : Status_t;
 begin
   Result := BWindow_RemoveFromSubset(CPlusObject, window.CPlusObject);
-end;
-
-function BWindow.Perform(d : Perform_code; arg : Pointer) : Status_t;
-begin
-  Result := BWindow_Perform(CPlusObject, d, arg);
 end;
 
 function BWindow.SetType(aType : Cardinal) : Status_t;

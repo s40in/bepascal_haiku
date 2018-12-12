@@ -480,19 +480,6 @@ BStringView_GetSupportedSuites(BStringView *StringView, BMessage *data)
 }
 
 
-/***********************************************************************
- *  Method: BStringView::Perform
- *  Params: perform_code d, void *arg
- * Returns: status_t
- * Effects: 
- ***********************************************************************/
-#ifndef __HAIKU__
-status_t
-BStringView_Perform(BStringView *StringView, perform_code d, void *arg)
-{
-   return StringView->Perform(d, arg);
-}
-#endif
 
 /***********************************************************************
  *  Method: BStringView::_ReservedStringView1

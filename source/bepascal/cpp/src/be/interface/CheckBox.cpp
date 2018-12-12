@@ -88,7 +88,7 @@ virtual void		AllDetached();
 
 
 /*----- Private or reserved -----------------------------------------*/
-//virtual status_t	Perform(perform_code d, void *arg);
+
 
 private:
 };
@@ -554,18 +554,6 @@ BCheckBox_AllDetached(BCheckBox *CheckBox)
    CheckBox->AllDetached();
 }
 
-
-/***********************************************************************
- *  Method: BCheckBox::Perform
- *  Params: perform_code d, void *arg
- * Returns: status_t
- * Effects: 
- ***********************************************************************/
-status_t
-BCheckBox_Perform(BCheckBox *CheckBox, perform_code d, void *arg)
-{
-   return CheckBox->Perform(d, arg);
-}
 
 
 /***********************************************************************

@@ -235,7 +235,7 @@ BFilePanel_GetPanelDirectory(BFilePanel *FilePanel, entry_ref *ref)
 file_panel_mode
 BFilePanel_PanelMode(BFilePanel *FilePanel) 
 {
-//   return FilePanel->PanelMode();
+   return FilePanel->PanelMode();
 }
 
 

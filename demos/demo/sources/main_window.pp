@@ -34,13 +34,15 @@ type
     Tab1    : BTab;
     Tab2    : BTab;
   public
-    constructor Create(aFrame : BRect; title : PChar; atype, aFlags, aWorkspaces : Cardinal); override;
-    destructor Destroy; override;
-    procedure MessageReceived(amessage : BMessage); override;
     VButton : TButton_View;
     VEdit   : TEdit_View;
     Explain : BStringView;
     VOther  : TOther_View;
+
+    constructor Create(aFrame : BRect; title : PChar; atype, aFlags, aWorkspaces : Cardinal); override;
+    destructor Destroy; override;
+    procedure MessageReceived(amessage : BMessage); override;
+
   end;
 
 const

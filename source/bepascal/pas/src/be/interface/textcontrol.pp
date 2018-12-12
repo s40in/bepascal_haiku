@@ -63,9 +63,6 @@ type
     procedure AllDetached;override;
     function GetSupportedSuites(data : BMessage) : Status_t;
     procedure SetFlags(flags : Cardinal);
-    {$ifndef HAIKU}    
-    function Perform(d : Perform_code; arg : Pointer) : Status_t;
-    {$endif}
   {  procedure _ReservedTextControl1;
     procedure _ReservedTextControl2;
     procedure _ReservedTextControl3;
@@ -124,9 +121,6 @@ procedure BTextControl_AllAttached(AObject : TCPlusObject); cdecl; external BePa
 procedure BTextControl_AllDetached(AObject : TCPlusObject); cdecl; external BePascalLibName name 'BTextControl_AllDetached';
 function BTextControl_GetSupportedSuites(AObject : TCPlusObject; data : TCPlusObject) : Status_t; cdecl; external BePascalLibName name 'BTextControl_GetSupportedSuites';
 procedure BTextControl_SetFlags(AObject : TCPlusObject; flags : Cardinal); cdecl; external BePascalLibName name 'BTextControl_SetFlags';
-function BTextControl_Perform(AObject : TCPlusObject; d : Perform_code; arg : Pointer) : Status_t; cdecl; external BePascalLibName name 'BTextControl_Perform';
-
-
 
 {procedure BTextControl__ReservedTextControl1(AObject : TCPlusObject); cdecl; external BePascalLibName name 'BTextControl__ReservedTextControl1';
 procedure BTextControl__ReservedTextControl2(AObject : TCPlusObject); cdecl; external BePascalLibName name 'BTextControl__ReservedTextControl2';
@@ -326,13 +320,6 @@ procedure BTextControl.SetFlags(flags : Cardinal);
 begin
   BTextControl_SetFlags(CPlusObject, flags);
 end;
-
-{$ifndef HAIKU}
-function BTextControl.Perform(d : Perform_code; arg : Pointer) : Status_t;
-begin
-  Result := BTextControl_Perform(CPlusObject, d, arg);
-end;
-{$endif}
 
 {procedure BTextControl._ReservedTextControl1;
 begin

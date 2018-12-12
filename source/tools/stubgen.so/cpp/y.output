@@ -1,0 +1,6237 @@
+Grammar
+
+    0 $accept: translation_unit $end
+
+    1 translation_unit: declaration
+    2                 | translation_unit declaration
+
+    3 declaration: declaration_specifiers ';'
+    4            | EXTERN STRING_LITERAL compound_statement
+    5            | member_func_inlined
+    6            | function_skeleton
+    7            | ';'
+    8            | error
+
+    9 declaration_specifiers: member_specifier
+   10                       | forward_decl
+
+   11 type_specifier: union_specifier
+   12               | enum_specifier
+   13               | class_specifier
+
+   14 ampersand_opt: %empty
+   15              | '&'
+
+   16 type_name: non_reference_type ampersand_opt
+   17          | CONST non_reference_type ampersand_opt
+
+   18 forward_decl: CLASS IDENTIFIER
+   19             | CLASS scoped_identifier
+   20             | STRUCT IDENTIFIER
+   21             | STRUCT scoped_identifier
+
+   22 non_reference_type: scoped_identifier
+   23                   | IDENTIFIER
+   24                   | STRUCT IDENTIFIER
+   25                   | scoped_identifier '<' template_instance_arg_list '>'
+   26                   | IDENTIFIER '<' template_instance_arg_list '>'
+   27                   | scoped_identifier '<' template_instance_arg_list '>' pointer
+   28                   | IDENTIFIER '<' template_instance_arg_list '>' pointer
+   29                   | scoped_identifier pointer
+   30                   | IDENTIFIER pointer
+   31                   | STRUCT IDENTIFIER pointer
+   32                   | simple_signed_type
+   33                   | simple_signed_type pointer
+
+   34 simple_signed_type: simple_type_name
+   35                   | SIGNED simple_type_name
+   36                   | UNSIGNED simple_type_name
+
+   37 simple_type_name: CHAR
+   38                 | SHORT
+   39                 | SHORT INT
+   40                 | INT
+   41                 | LONG
+   42                 | LONG INT
+   43                 | LONG LONG
+   44                 | LONG LONG INT
+   45                 | UNSIGNED
+   46                 | FLOAT
+   47                 | DOUBLE
+   48                 | VOID
+
+   49 scoped_identifier: IDENTIFIER CLCL IDENTIFIER
+   50                  | scoped_identifier CLCL IDENTIFIER
+
+   51 pointer: asterisk
+   52        | pointer asterisk
+
+   53 asterisk: '*'
+   54         | '*' CONST
+
+   55 variable_or_parameter: type_name bitfield_savvy_identifier
+   56                      | type_name scoped_identifier
+   57                      | variable_or_parameter '[' constant_value ']'
+   58                      | variable_or_parameter '[' ']'
+
+   59 bitfield_savvy_identifier: IDENTIFIER
+   60                          | IDENTIFIER ':' CONSTANT
+
+   61 variable_name: bitfield_savvy_identifier
+   62              | pointer IDENTIFIER
+   63              | variable_name '[' constant_value ']'
+   64              | variable_name '[' ']'
+
+   65 variable_specifier: variable_or_parameter
+   66                   | EXTERN variable_or_parameter
+   67                   | variable_or_parameter '=' constant_value
+
+   68 multiple_variable_specifier: variable_specifier
+   69                            | multiple_variable_specifier ',' variable_name
+
+   70 variable_specifier_list: multiple_variable_specifier ';'
+   71                        | variable_specifier_list multiple_variable_specifier ';'
+
+   72 parameter_list_opt: %empty
+   73                   | parameter_list
+   74                   | parameter_list ',' ELIPSIS
+   75                   | ELIPSIS
+
+   76 parameter_list: variable_specifier
+   77               | unnamed_parameter
+   78               | parameter_list ',' variable_specifier
+   79               | parameter_list ',' unnamed_parameter
+
+   80 unnamed_parameter: type_name
+   81                  | type_name '=' constant_value
+   82                  | unnamed_parameter '[' constant_value ']'
+   83                  | unnamed_parameter '[' ']'
+
+   84 function_skeleton: member_func_skel compound_statement
+
+   85 $@1: %empty
+
+   86 function_skeleton: constructor_skeleton ':' $@1 compound_statement
+   87                  | template_specifier member_func_skel compound_statement
+
+   88 $@2: %empty
+
+   89 function_skeleton: template_specifier constructor_skeleton ':' $@2 compound_statement
+
+   90 member_func_inlined: member_func_specifier compound_statement
+
+   91 $@3: %empty
+
+   92 member_func_inlined: constructor ':' $@3 compound_statement
+
+   93 member_func_skel: member_func_skel_spec const_opt throw_decl
+   94                 | constructor_skeleton
+   95                 | destructor_skeleton
+
+   96 member_func_specifier: function_specifier const_opt throw_decl
+   97                      | constructor
+   98                      | destructor
+
+   99 member_func_skel_spec: type_name scoped_identifier '(' parameter_list_opt ')'
+  100                      | type_name IDENTIFIER '<' template_instance_arg_list '>' CLCL IDENTIFIER '(' parameter_list_opt ')'
+  101                      | overloaded_op_skeleton
+
+  102 function_specifier: type_name IDENTIFIER '(' parameter_list_opt ')'
+  103                   | overloaded_op_specifier
+
+  104 overloaded_op_skeleton: type_name scoped_identifier CLCL OPERATOR any_operator '(' parameter_list_opt ')'
+  105                       | scoped_identifier CLCL OPERATOR type_name '(' ')'
+  106                       | type_name IDENTIFIER CLCL OPERATOR any_operator '(' parameter_list_opt ')'
+  107                       | IDENTIFIER CLCL OPERATOR type_name '(' ')'
+
+  108 overloaded_op_specifier: type_name OPERATOR any_operator '(' parameter_list_opt ')'
+  109                        | OPERATOR type_name '(' ')'
+
+  110 const_opt: %empty
+  111          | CONST
+
+  112 throw_decl: %empty
+  113           | THROW '(' throw_list ')'
+
+  114 throw_list: type_name
+  115           | throw_list ',' type_name
+
+  116 destructor: '~' IDENTIFIER '(' ')'
+
+  117 destructor_skeleton: scoped_identifier CLCL '~' IDENTIFIER '(' ')'
+  118                    | IDENTIFIER CLCL '~' IDENTIFIER '(' ')'
+  119                    | IDENTIFIER '<' template_instance_arg_list '>' CLCL '~' IDENTIFIER '(' ')'
+  120                    | scoped_identifier '<' template_instance_arg_list '>' CLCL '~' IDENTIFIER '(' ')'
+
+  121 constructor: IDENTIFIER '(' parameter_list_opt ')' throw_decl
+
+  122 constructor_skeleton: scoped_identifier '(' parameter_list_opt ')' throw_decl
+  123                     | IDENTIFIER '<' template_instance_arg_list '>' CLCL IDENTIFIER '(' parameter_list_opt ')' throw_decl
+  124                     | scoped_identifier '<' template_instance_arg_list '>' CLCL IDENTIFIER '(' parameter_list_opt ')' throw_decl
+
+  125 $@4: %empty
+
+  126 compound_statement: '{' $@4 '}'
+
+  127 enum_specifier: ENUM '{' enumerator_list '}'
+  128               | ENUM IDENTIFIER '{' enumerator_list '}'
+  129               | ENUM IDENTIFIER
+
+  130 enumerator_list: enumerator
+  131                | enumerator_list ',' enumerator
+
+  132 enumerator: IDENTIFIER
+  133           | IDENTIFIER '=' constant_value
+
+  134 access_specifier_opt: %empty
+  135                     | access_specifier
+
+  136 access_specifier_list: access_specifier ':'
+  137                      | access_specifier_list access_specifier ':'
+
+  138 access_specifier: PUBLIC
+  139                 | PRIVATE
+  140                 | PROTECTED
+
+  141 unary_operator: '&'
+  142               | '*'
+  143               | '+'
+  144               | '-'
+  145               | '~'
+  146               | '!'
+
+  147 binary_operator: '/'
+  148                | '%'
+  149                | '^'
+  150                | '|'
+  151                | '<'
+  152                | '>'
+  153                | ','
+
+  154 assignment_operator: '='
+  155                    | MUL_ASSIGN
+  156                    | DIV_ASSIGN
+  157                    | MOD_ASSIGN
+  158                    | ADD_ASSIGN
+  159                    | SUB_ASSIGN
+  160                    | LEFT_ASSIGN
+  161                    | RIGHT_ASSIGN
+  162                    | AND_ASSIGN
+  163                    | XOR_ASSIGN
+  164                    | OR_ASSIGN
+
+  165 any_operator: assignment_operator
+  166             | unary_operator
+  167             | binary_operator
+  168             | NEW
+  169             | DELETE
+  170             | PTR_OP
+  171             | MEM_PTR_OP
+  172             | INC_OP
+  173             | DEC_OP
+  174             | LEFT_OP
+  175             | RIGHT_OP
+  176             | LE_OP
+  177             | GE_OP
+  178             | EQ_OP
+  179             | NE_OP
+  180             | AND_OP
+  181             | OR_OP
+  182             | '[' ']'
+  183             | '(' ')'
+
+  184 constant_value: expression
+  185               | compound_statement
+
+  186 expression: additive_expression
+
+  187 primary_expression: CONSTANT
+  188                   | '-' CONSTANT
+  189                   | STRING_LITERAL
+  190                   | IDENTIFIER
+  191                   | scoped_identifier
+  192                   | '(' expression ')'
+
+  193 multiplicative_expression: primary_expression
+  194                          | multiplicative_expression '*' primary_expression
+  195                          | multiplicative_expression '/' primary_expression
+  196                          | multiplicative_expression '%' primary_expression
+
+  197 additive_expression: multiplicative_expression
+  198                    | additive_expression '+' multiplicative_expression
+  199                    | additive_expression '-' multiplicative_expression
+
+  200 union_specifier: UNION IDENTIFIER '{' variable_specifier_list '}'
+  201                | UNION '{' variable_specifier_list '}'
+  202                | UNION IDENTIFIER
+
+  203 class_specifier: CLASS IDENTIFIER '{' member_list_opt '}'
+  204                | CLASS IDENTIFIER ':' superclass_list '{' member_list_opt '}'
+  205                | template_specifier CLASS IDENTIFIER '{' member_list_opt '}'
+  206                | template_specifier CLASS IDENTIFIER ':' superclass_list '{' member_list_opt '}'
+  207                | STRUCT '{' member_list_opt '}'
+  208                | STRUCT IDENTIFIER '{' member_list_opt '}'
+  209                | STRUCT IDENTIFIER ':' superclass_list '{' member_list_opt '}'
+  210                | template_specifier STRUCT IDENTIFIER '{' member_list_opt '}'
+  211                | template_specifier STRUCT IDENTIFIER ':' superclass_list '{' member_list_opt '}'
+
+  212 superclass_list: superclass
+  213                | superclass_list ',' superclass
+
+  214 superclass: access_specifier_opt type_name
+
+  215 friend_specifier: FRIEND member_func_specifier
+  216                 | FRIEND forward_decl
+
+  217 member_list_opt: %empty
+  218                | member_list
+
+  219 member_list: member_with_access
+  220            | member_list member_with_access
+
+  221 member_or_error: member
+  222                | error
+
+  223 member_with_access: member_or_error
+  224                   | access_specifier_list member_or_error
+
+  225 member: member_specifier ';'
+  226       | friend_specifier ';'
+  227       | member_func_inlined
+  228       | ';'
+
+  229 member_specifier: multiple_variable_specifier
+  230                 | member_func_specifier
+  231                 | EXTERN member_func_specifier
+  232                 | member_func_specifier '=' CONSTANT
+  233                 | mem_type_specifier
+
+  234 mem_type_specifier: type_specifier
+  235                   | type_specifier IDENTIFIER
+  236                   | mem_type_specifier '[' ']'
+  237                   | mem_type_specifier '[' constant_value ']'
+
+  238 template_arg: CLASS IDENTIFIER
+  239             | type_name IDENTIFIER
+
+  240 template_arg_list: template_arg
+  241                  | template_arg_list ',' template_arg
+
+  242 template_instance_arg: CONSTANT
+  243                      | type_name
+
+  244 template_instance_arg_list: template_instance_arg
+  245                           | template_instance_arg_list ',' template_instance_arg
+
+  246 template_specifier: TEMPLATE '<' template_arg_list '>'
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+'!' (33) 146
+'%' (37) 148 196
+'&' (38) 15 141
+'(' (40) 99 100 102 104 105 106 107 108 109 113 116 117 118 119 120
+    121 122 123 124 183 192
+')' (41) 99 100 102 104 105 106 107 108 109 113 116 117 118 119 120
+    121 122 123 124 183 192
+'*' (42) 53 54 142 194
+'+' (43) 143 198
+',' (44) 69 74 78 79 115 131 153 213 241 245
+'-' (45) 144 188 199
+'/' (47) 147 195
+':' (58) 60 86 89 92 136 137 204 206 209 211
+';' (59) 3 7 70 71 225 226 228
+'<' (60) 25 26 27 28 100 119 120 123 124 151 246
+'=' (61) 67 81 133 154 232
+'>' (62) 25 26 27 28 100 119 120 123 124 152 246
+'[' (91) 57 58 63 64 82 83 182 236 237
+']' (93) 57 58 63 64 82 83 182 236 237
+'^' (94) 149
+'{' (123) 126 127 128 200 201 203 204 205 206 207 208 209 210 211
+'|' (124) 150
+'}' (125) 126 127 128 200 201 203 204 205 206 207 208 209 210 211
+'~' (126) 116 117 118 119 120 145
+error (256) 8 222
+IDENTIFIER (258) 18 20 23 24 26 28 30 31 49 50 59 60 62 100 102 106
+    107 116 117 118 119 120 121 123 124 128 129 132 133 190 200 202
+    203 204 205 206 208 209 210 211 235 238 239
+CONSTANT (259) 60 187 188 232 242
+STRING_LITERAL (260) 4 189
+CHAR (261) 37
+SHORT (262) 38 39
+INT (263) 39 40 42 44
+LONG (264) 41 42 43 44
+SIGNED (265) 35
+UNSIGNED (266) 36 45
+FLOAT (267) 46
+DOUBLE (268) 47
+VOID (269) 48
+NEW (270) 168
+DELETE (271) 169
+TEMPLATE (272) 246
+THROW (273) 113
+PTR_OP (274) 170
+INC_OP (275) 172
+DEC_OP (276) 173
+LEFT_OP (277) 174
+RIGHT_OP (278) 175
+LE_OP (279) 176
+GE_OP (280) 177
+EQ_OP (281) 178
+NE_OP (282) 179
+AND_OP (283) 180
+OR_OP (284) 181
+MUL_ASSIGN (285) 155
+DIV_ASSIGN (286) 156
+MOD_ASSIGN (287) 157
+ADD_ASSIGN (288) 158
+SUB_ASSIGN (289) 159
+LEFT_ASSIGN (290) 160
+RIGHT_ASSIGN (291) 161
+AND_ASSIGN (292) 162
+XOR_ASSIGN (293) 163
+OR_ASSIGN (294) 164
+CLCL (295) 49 50 100 104 105 106 107 117 118 119 120 123 124
+MEM_PTR_OP (296) 171
+FRIEND (297) 215 216
+OPERATOR (298) 104 105 106 107 108 109
+CONST (299) 17 54 111
+CLASS (300) 18 19 203 204 205 206 238
+STRUCT (301) 20 21 24 31 207 208 209 210 211
+UNION (302) 200 201 202
+ENUM (303) 127 128 129
+PROTECTED (304) 140
+PRIVATE (305) 139
+PUBLIC (306) 138
+EXTERN (307) 4 66 231
+ELIPSIS (308) 74 75
+
+
+Nonterminals, with rules where they appear
+
+$accept (76)
+    on left: 0
+translation_unit (77)
+    on left: 1 2, on right: 0 2
+declaration (78)
+    on left: 3 4 5 6 7 8, on right: 1 2
+declaration_specifiers (79)
+    on left: 9 10, on right: 3
+type_specifier (80)
+    on left: 11 12 13, on right: 234 235
+ampersand_opt (81)
+    on left: 14 15, on right: 16 17
+type_name (82)
+    on left: 16 17, on right: 55 56 80 81 99 100 102 104 105 106 107
+    108 109 114 115 214 239 243
+forward_decl (83)
+    on left: 18 19 20 21, on right: 10 216
+non_reference_type (84)
+    on left: 22 23 24 25 26 27 28 29 30 31 32 33, on right: 16 17
+simple_signed_type (85)
+    on left: 34 35 36, on right: 32 33
+simple_type_name (86)
+    on left: 37 38 39 40 41 42 43 44 45 46 47 48, on right: 34 35 36
+scoped_identifier (87)
+    on left: 49 50, on right: 19 21 22 25 27 29 50 56 99 104 105 117
+    120 122 124 191
+pointer (88)
+    on left: 51 52, on right: 27 28 29 30 31 33 52 62
+asterisk (89)
+    on left: 53 54, on right: 51 52
+variable_or_parameter (90)
+    on left: 55 56 57 58, on right: 57 58 65 66 67
+bitfield_savvy_identifier (91)
+    on left: 59 60, on right: 55 61
+variable_name (92)
+    on left: 61 62 63 64, on right: 63 64 69
+variable_specifier (93)
+    on left: 65 66 67, on right: 68 76 78
+multiple_variable_specifier (94)
+    on left: 68 69, on right: 69 70 71 229
+variable_specifier_list (95)
+    on left: 70 71, on right: 71 200 201
+parameter_list_opt (96)
+    on left: 72 73 74 75, on right: 99 100 102 104 106 108 121 122
+    123 124
+parameter_list (97)
+    on left: 76 77 78 79, on right: 73 74 78 79
+unnamed_parameter (98)
+    on left: 80 81 82 83, on right: 77 79 82 83
+function_skeleton (99)
+    on left: 84 86 87 89, on right: 6
+$@1 (100)
+    on left: 85, on right: 86
+$@2 (101)
+    on left: 88, on right: 89
+member_func_inlined (102)
+    on left: 90 92, on right: 5 227
+$@3 (103)
+    on left: 91, on right: 92
+member_func_skel (104)
+    on left: 93 94 95, on right: 84 87
+member_func_specifier (105)
+    on left: 96 97 98, on right: 90 215 230 231 232
+member_func_skel_spec (106)
+    on left: 99 100 101, on right: 93
+function_specifier (107)
+    on left: 102 103, on right: 96
+overloaded_op_skeleton (108)
+    on left: 104 105 106 107, on right: 101
+overloaded_op_specifier (109)
+    on left: 108 109, on right: 103
+const_opt (110)
+    on left: 110 111, on right: 93 96
+throw_decl (111)
+    on left: 112 113, on right: 93 96 121 122 123 124
+throw_list (112)
+    on left: 114 115, on right: 113 115
+destructor (113)
+    on left: 116, on right: 98
+destructor_skeleton (114)
+    on left: 117 118 119 120, on right: 95
+constructor (115)
+    on left: 121, on right: 92 97
+constructor_skeleton (116)
+    on left: 122 123 124, on right: 86 89 94
+compound_statement (117)
+    on left: 126, on right: 4 84 86 87 89 90 92 185
+$@4 (118)
+    on left: 125, on right: 126
+enum_specifier (119)
+    on left: 127 128 129, on right: 12
+enumerator_list (120)
+    on left: 130 131, on right: 127 128 131
+enumerator (121)
+    on left: 132 133, on right: 130 131
+access_specifier_opt (122)
+    on left: 134 135, on right: 214
+access_specifier_list (123)
+    on left: 136 137, on right: 137 224
+access_specifier (124)
+    on left: 138 139 140, on right: 135 136 137
+unary_operator (125)
+    on left: 141 142 143 144 145 146, on right: 166
+binary_operator (126)
+    on left: 147 148 149 150 151 152 153, on right: 167
+assignment_operator (127)
+    on left: 154 155 156 157 158 159 160 161 162 163 164, on right:
+    165
+any_operator (128)
+    on left: 165 166 167 168 169 170 171 172 173 174 175 176 177 178
+    179 180 181 182 183, on right: 104 106 108
+constant_value (129)
+    on left: 184 185, on right: 57 63 67 81 82 133 237
+expression (130)
+    on left: 186, on right: 184 192
+primary_expression (131)
+    on left: 187 188 189 190 191 192, on right: 193 194 195 196
+multiplicative_expression (132)
+    on left: 193 194 195 196, on right: 194 195 196 197 198 199
+additive_expression (133)
+    on left: 197 198 199, on right: 186 198 199
+union_specifier (134)
+    on left: 200 201 202, on right: 11
+class_specifier (135)
+    on left: 203 204 205 206 207 208 209 210 211, on right: 13
+superclass_list (136)
+    on left: 212 213, on right: 204 206 209 211 213
+superclass (137)
+    on left: 214, on right: 212 213
+friend_specifier (138)
+    on left: 215 216, on right: 226
+member_list_opt (139)
+    on left: 217 218, on right: 203 204 205 206 207 208 209 210 211
+member_list (140)
+    on left: 219 220, on right: 218 220
+member_or_error (141)
+    on left: 221 222, on right: 223 224
+member_with_access (142)
+    on left: 223 224, on right: 219 220
+member (143)
+    on left: 225 226 227 228, on right: 221
+member_specifier (144)
+    on left: 229 230 231 232 233, on right: 9 225
+mem_type_specifier (145)
+    on left: 234 235 236 237, on right: 233 236 237
+template_arg (146)
+    on left: 238 239, on right: 240 241
+template_arg_list (147)
+    on left: 240 241, on right: 241 246
+template_instance_arg (148)
+    on left: 242 243, on right: 244 245
+template_instance_arg_list (149)
+    on left: 244 245, on right: 25 26 27 28 100 119 120 123 124 245
+template_specifier (150)
+    on left: 246, on right: 87 89 205 206 210 211
+
+
+State 0
+
+    0 $accept: . translation_unit $end
+
+    error       shift, and go to state 1
+    IDENTIFIER  shift, and go to state 2
+    CHAR        shift, and go to state 3
+    SHORT       shift, and go to state 4
+    INT         shift, and go to state 5
+    LONG        shift, and go to state 6
+    SIGNED      shift, and go to state 7
+    UNSIGNED    shift, and go to state 8
+    FLOAT       shift, and go to state 9
+    DOUBLE      shift, and go to state 10
+    VOID        shift, and go to state 11
+    TEMPLATE    shift, and go to state 12
+    OPERATOR    shift, and go to state 13
+    CONST       shift, and go to state 14
+    CLASS       shift, and go to state 15
+    STRUCT      shift, and go to state 16
+    UNION       shift, and go to state 17
+    ENUM        shift, and go to state 18
+    EXTERN      shift, and go to state 19
+    ';'         shift, and go to state 20
+    '~'         shift, and go to state 21
+
+    translation_unit             go to state 22
+    declaration                  go to state 23
+    declaration_specifiers       go to state 24
+    type_specifier               go to state 25
+    type_name                    go to state 26
+    forward_decl                 go to state 27
+    non_reference_type           go to state 28
+    simple_signed_type           go to state 29
+    simple_type_name             go to state 30
+    scoped_identifier            go to state 31
+    variable_or_parameter        go to state 32
+    variable_specifier           go to state 33
+    multiple_variable_specifier  go to state 34
+    function_skeleton            go to state 35
+    member_func_inlined          go to state 36
+    member_func_skel             go to state 37
+    member_func_specifier        go to state 38
+    member_func_skel_spec        go to state 39
+    function_specifier           go to state 40
+    overloaded_op_skeleton       go to state 41
+    overloaded_op_specifier      go to state 42
+    destructor                   go to state 43
+    destructor_skeleton          go to state 44
+    constructor                  go to state 45
+    constructor_skeleton         go to state 46
+    enum_specifier               go to state 47
+    union_specifier              go to state 48
+    class_specifier              go to state 49
+    member_specifier             go to state 50
+    mem_type_specifier           go to state 51
+    template_specifier           go to state 52
+
+
+State 1
+
+    8 declaration: error .
+
+    $default  reduce using rule 8 (declaration)
+
+
+State 2
+
+   23 non_reference_type: IDENTIFIER .
+   26                   | IDENTIFIER . '<' template_instance_arg_list '>'
+   28                   | IDENTIFIER . '<' template_instance_arg_list '>' pointer
+   30                   | IDENTIFIER . pointer
+   49 scoped_identifier: IDENTIFIER . CLCL IDENTIFIER
+  107 overloaded_op_skeleton: IDENTIFIER . CLCL OPERATOR type_name '(' ')'
+  118 destructor_skeleton: IDENTIFIER . CLCL '~' IDENTIFIER '(' ')'
+  119                    | IDENTIFIER . '<' template_instance_arg_list '>' CLCL '~' IDENTIFIER '(' ')'
+  121 constructor: IDENTIFIER . '(' parameter_list_opt ')' throw_decl
+  123 constructor_skeleton: IDENTIFIER . '<' template_instance_arg_list '>' CLCL IDENTIFIER '(' parameter_list_opt ')' throw_decl
+
+    CLCL  shift, and go to state 53
+    '<'   shift, and go to state 54
+    '*'   shift, and go to state 55
+    '('   shift, and go to state 56
+
+    $default  reduce using rule 23 (non_reference_type)
+
+    pointer   go to state 57
+    asterisk  go to state 58
+
+
+State 3
+
+   37 simple_type_name: CHAR .
+
+    $default  reduce using rule 37 (simple_type_name)
+
+
+State 4
+
+   38 simple_type_name: SHORT .
+   39                 | SHORT . INT
+
+    INT  shift, and go to state 59
+
+    $default  reduce using rule 38 (simple_type_name)
+
+
+State 5
+
+   40 simple_type_name: INT .
+
+    $default  reduce using rule 40 (simple_type_name)
+
+
+State 6
+
+   41 simple_type_name: LONG .
+   42                 | LONG . INT
+   43                 | LONG . LONG
+   44                 | LONG . LONG INT
+
+    INT   shift, and go to state 60
+    LONG  shift, and go to state 61
+
+    $default  reduce using rule 41 (simple_type_name)
+
+
+State 7
+
+   35 simple_signed_type: SIGNED . simple_type_name
+
+    CHAR      shift, and go to state 3
+    SHORT     shift, and go to state 4
+    INT       shift, and go to state 5
+    LONG      shift, and go to state 6
+    UNSIGNED  shift, and go to state 62
+    FLOAT     shift, and go to state 9
+    DOUBLE    shift, and go to state 10
+    VOID      shift, and go to state 11
+
+    simple_type_name  go to state 63
+
+
+State 8
+
+   36 simple_signed_type: UNSIGNED . simple_type_name
+   45 simple_type_name: UNSIGNED .
+
+    CHAR      shift, and go to state 3
+    SHORT     shift, and go to state 4
+    INT       shift, and go to state 5
+    LONG      shift, and go to state 6
+    UNSIGNED  shift, and go to state 62
+    FLOAT     shift, and go to state 9
+    DOUBLE    shift, and go to state 10
+    VOID      shift, and go to state 11
+
+    $default  reduce using rule 45 (simple_type_name)
+
+    simple_type_name  go to state 64
+
+
+State 9
+
+   46 simple_type_name: FLOAT .
+
+    $default  reduce using rule 46 (simple_type_name)
+
+
+State 10
+
+   47 simple_type_name: DOUBLE .
+
+    $default  reduce using rule 47 (simple_type_name)
+
+
+State 11
+
+   48 simple_type_name: VOID .
+
+    $default  reduce using rule 48 (simple_type_name)
+
+
+State 12
+
+  246 template_specifier: TEMPLATE . '<' template_arg_list '>'
+
+    '<'  shift, and go to state 65
+
+
+State 13
+
+  109 overloaded_op_specifier: OPERATOR . type_name '(' ')'
+
+    IDENTIFIER  shift, and go to state 66
+    CHAR        shift, and go to state 3
+    SHORT       shift, and go to state 4
+    INT         shift, and go to state 5
+    LONG        shift, and go to state 6
+    SIGNED      shift, and go to state 7
+    UNSIGNED    shift, and go to state 8
+    FLOAT       shift, and go to state 9
+    DOUBLE      shift, and go to state 10
+    VOID        shift, and go to state 11
+    CONST       shift, and go to state 14
+    STRUCT      shift, and go to state 67
+
+    type_name           go to state 68
+    non_reference_type  go to state 28
+    simple_signed_type  go to state 29
+    simple_type_name    go to state 30
+    scoped_identifier   go to state 69
+
+
+State 14
+
+   17 type_name: CONST . non_reference_type ampersand_opt
+
+    IDENTIFIER  shift, and go to state 66
+    CHAR        shift, and go to state 3
+    SHORT       shift, and go to state 4
+    INT         shift, and go to state 5
+    LONG        shift, and go to state 6
+    SIGNED      shift, and go to state 7
+    UNSIGNED    shift, and go to state 8
+    FLOAT       shift, and go to state 9
+    DOUBLE      shift, and go to state 10
+    VOID        shift, and go to state 11
+    STRUCT      shift, and go to state 67
+
+    non_reference_type  go to state 70
+    simple_signed_type  go to state 29
+    simple_type_name    go to state 30
+    scoped_identifier   go to state 69
+
+
+State 15
+
+   18 forward_decl: CLASS . IDENTIFIER
+   19             | CLASS . scoped_identifier
+  203 class_specifier: CLASS . IDENTIFIER '{' member_list_opt '}'
+  204                | CLASS . IDENTIFIER ':' superclass_list '{' member_list_opt '}'
+
+    IDENTIFIER  shift, and go to state 71
+
+    scoped_identifier  go to state 72
+
+
+State 16
+
+   20 forward_decl: STRUCT . IDENTIFIER
+   21             | STRUCT . scoped_identifier
+   24 non_reference_type: STRUCT . IDENTIFIER
+   31                   | STRUCT . IDENTIFIER pointer
+  207 class_specifier: STRUCT . '{' member_list_opt '}'
+  208                | STRUCT . IDENTIFIER '{' member_list_opt '}'
+  209                | STRUCT . IDENTIFIER ':' superclass_list '{' member_list_opt '}'
+
+    IDENTIFIER  shift, and go to state 73
+    '{'         shift, and go to state 74
+
+    scoped_identifier  go to state 75
+
+
+State 17
+
+  200 union_specifier: UNION . IDENTIFIER '{' variable_specifier_list '}'
+  201                | UNION . '{' variable_specifier_list '}'
+  202                | UNION . IDENTIFIER
+
+    IDENTIFIER  shift, and go to state 76
+    '{'         shift, and go to state 77
+
+
+State 18
+
+  127 enum_specifier: ENUM . '{' enumerator_list '}'
+  128               | ENUM . IDENTIFIER '{' enumerator_list '}'
+  129               | ENUM . IDENTIFIER
+
+    IDENTIFIER  shift, and go to state 78
+    '{'         shift, and go to state 79
+
+
+State 19
+
+    4 declaration: EXTERN . STRING_LITERAL compound_statement
+   66 variable_specifier: EXTERN . variable_or_parameter
+  231 member_specifier: EXTERN . member_func_specifier
+
+    IDENTIFIER      shift, and go to state 80
+    STRING_LITERAL  shift, and go to state 81
+    CHAR            shift, and go to state 3
+    SHORT           shift, and go to state 4
+    INT             shift, and go to state 5
+    LONG            shift, and go to state 6
+    SIGNED          shift, and go to state 7
+    UNSIGNED        shift, and go to state 8
+    FLOAT           shift, and go to state 9
+    DOUBLE          shift, and go to state 10
+    VOID            shift, and go to state 11
+    OPERATOR        shift, and go to state 13
+    CONST           shift, and go to state 14
+    STRUCT          shift, and go to state 67
+    '~'             shift, and go to state 21
+
+    type_name                go to state 82
+    non_reference_type       go to state 28
+    simple_signed_type       go to state 29
+    simple_type_name         go to state 30
+    scoped_identifier        go to state 69
+    variable_or_parameter    go to state 83
+    member_func_specifier    go to state 84
+    function_specifier       go to state 40
+    overloaded_op_specifier  go to state 42
+    destructor               go to state 43
+    constructor              go to state 85
+
+
+State 20
+
+    7 declaration: ';' .
+
+    $default  reduce using rule 7 (declaration)
+
+
+State 21
+
+  116 destructor: '~' . IDENTIFIER '(' ')'
+
+    IDENTIFIER  shift, and go to state 86
+
+
+State 22
+
+    0 $accept: translation_unit . $end
+    2 translation_unit: translation_unit . declaration
+
+    $end        shift, and go to state 87
+    error       shift, and go to state 1
+    IDENTIFIER  shift, and go to state 2
+    CHAR        shift, and go to state 3
+    SHORT       shift, and go to state 4
+    INT         shift, and go to state 5
+    LONG        shift, and go to state 6
+    SIGNED      shift, and go to state 7
+    UNSIGNED    shift, and go to state 8
+    FLOAT       shift, and go to state 9
+    DOUBLE      shift, and go to state 10
+    VOID        shift, and go to state 11
+    TEMPLATE    shift, and go to state 12
+    OPERATOR    shift, and go to state 13
+    CONST       shift, and go to state 14
+    CLASS       shift, and go to state 15
+    STRUCT      shift, and go to state 16
+    UNION       shift, and go to state 17
+    ENUM        shift, and go to state 18
+    EXTERN      shift, and go to state 19
+    ';'         shift, and go to state 20
+    '~'         shift, and go to state 21
+
+    declaration                  go to state 88
+    declaration_specifiers       go to state 24
+    type_specifier               go to state 25
+    type_name                    go to state 26
+    forward_decl                 go to state 27
+    non_reference_type           go to state 28
+    simple_signed_type           go to state 29
+    simple_type_name             go to state 30
+    scoped_identifier            go to state 31
+    variable_or_parameter        go to state 32
+    variable_specifier           go to state 33
+    multiple_variable_specifier  go to state 34
+    function_skeleton            go to state 35
+    member_func_inlined          go to state 36
+    member_func_skel             go to state 37
+    member_func_specifier        go to state 38
+    member_func_skel_spec        go to state 39
+    function_specifier           go to state 40
+    overloaded_op_skeleton       go to state 41
+    overloaded_op_specifier      go to state 42
+    destructor                   go to state 43
+    destructor_skeleton          go to state 44
+    constructor                  go to state 45
+    constructor_skeleton         go to state 46
+    enum_specifier               go to state 47
+    union_specifier              go to state 48
+    class_specifier              go to state 49
+    member_specifier             go to state 50
+    mem_type_specifier           go to state 51
+    template_specifier           go to state 52
+
+
+State 23
+
+    1 translation_unit: declaration .
+
+    $default  reduce using rule 1 (translation_unit)
+
+
+State 24
+
+    3 declaration: declaration_specifiers . ';'
+
+    ';'  shift, and go to state 89
+
+
+State 25
+
+  234 mem_type_specifier: type_specifier .
+  235                   | type_specifier . IDENTIFIER
+
+    IDENTIFIER  shift, and go to state 90
+
+    $default  reduce using rule 234 (mem_type_specifier)
+
+
+State 26
+
+   55 variable_or_parameter: type_name . bitfield_savvy_identifier
+   56                      | type_name . scoped_identifier
+   99 member_func_skel_spec: type_name . scoped_identifier '(' parameter_list_opt ')'
+  100                      | type_name . IDENTIFIER '<' template_instance_arg_list '>' CLCL IDENTIFIER '(' parameter_list_opt ')'
+  102 function_specifier: type_name . IDENTIFIER '(' parameter_list_opt ')'
+  104 overloaded_op_skeleton: type_name . scoped_identifier CLCL OPERATOR any_operator '(' parameter_list_opt ')'
+  106                       | type_name . IDENTIFIER CLCL OPERATOR any_operator '(' parameter_list_opt ')'
+  108 overloaded_op_specifier: type_name . OPERATOR any_operator '(' parameter_list_opt ')'
+
+    IDENTIFIER  shift, and go to state 91
+    OPERATOR    shift, and go to state 92
+
+    scoped_identifier          go to state 93
+    bitfield_savvy_identifier  go to state 94
+
+
+State 27
+
+   10 declaration_specifiers: forward_decl .
+
+    $default  reduce using rule 10 (declaration_specifiers)
+
+
+State 28
+
+   16 type_name: non_reference_type . ampersand_opt
+
+    '&'  shift, and go to state 95
+
+    $default  reduce using rule 14 (ampersand_opt)
+
+    ampersand_opt  go to state 96
+
+
+State 29
+
+   32 non_reference_type: simple_signed_type .
+   33                   | simple_signed_type . pointer
+
+    '*'  shift, and go to state 55
+
+    $default  reduce using rule 32 (non_reference_type)
+
+    pointer   go to state 97
+    asterisk  go to state 58
+
+
+State 30
+
+   34 simple_signed_type: simple_type_name .
+
+    $default  reduce using rule 34 (simple_signed_type)
+
+
+State 31
+
+   22 non_reference_type: scoped_identifier .
+   25                   | scoped_identifier . '<' template_instance_arg_list '>'
+   27                   | scoped_identifier . '<' template_instance_arg_list '>' pointer
+   29                   | scoped_identifier . pointer
+   50 scoped_identifier: scoped_identifier . CLCL IDENTIFIER
+  105 overloaded_op_skeleton: scoped_identifier . CLCL OPERATOR type_name '(' ')'
+  117 destructor_skeleton: scoped_identifier . CLCL '~' IDENTIFIER '(' ')'
+  120                    | scoped_identifier . '<' template_instance_arg_list '>' CLCL '~' IDENTIFIER '(' ')'
+  122 constructor_skeleton: scoped_identifier . '(' parameter_list_opt ')' throw_decl
+  124                     | scoped_identifier . '<' template_instance_arg_list '>' CLCL IDENTIFIER '(' parameter_list_opt ')' throw_decl
+
+    CLCL  shift, and go to state 98
+    '<'   shift, and go to state 99
+    '*'   shift, and go to state 55
+    '('   shift, and go to state 100
+
+    $default  reduce using rule 22 (non_reference_type)
+
+    pointer   go to state 101
+    asterisk  go to state 58
+
+
+State 32
+
+   57 variable_or_parameter: variable_or_parameter . '[' constant_value ']'
+   58                      | variable_or_parameter . '[' ']'
+   65 variable_specifier: variable_or_parameter .
+   67                   | variable_or_parameter . '=' constant_value
+
+    '['  shift, and go to state 102
+    '='  shift, and go to state 103
+
+    $default  reduce using rule 65 (variable_specifier)
+
+
+State 33
+
+   68 multiple_variable_specifier: variable_specifier .
+
+    $default  reduce using rule 68 (multiple_variable_specifier)
+
+
+State 34
+
+   69 multiple_variable_specifier: multiple_variable_specifier . ',' variable_name
+  229 member_specifier: multiple_variable_specifier .
+
+    ','  shift, and go to state 104
+
+    $default  reduce using rule 229 (member_specifier)
+
+
+State 35
+
+    6 declaration: function_skeleton .
+
+    $default  reduce using rule 6 (declaration)
+
+
+State 36
+
+    5 declaration: member_func_inlined .
+
+    $default  reduce using rule 5 (declaration)
+
+
+State 37
+
+   84 function_skeleton: member_func_skel . compound_statement
+
+    '{'  shift, and go to state 105
+
+    compound_statement  go to state 106
+
+
+State 38
+
+   90 member_func_inlined: member_func_specifier . compound_statement
+  230 member_specifier: member_func_specifier .
+  232                 | member_func_specifier . '=' CONSTANT
+
+    '='  shift, and go to state 107
+    '{'  shift, and go to state 105
+
+    $default  reduce using rule 230 (member_specifier)
+
+    compound_statement  go to state 108
+
+
+State 39
+
+   93 member_func_skel: member_func_skel_spec . const_opt throw_decl
+
+    CONST  shift, and go to state 109
+
+    $default  reduce using rule 110 (const_opt)
+
+    const_opt  go to state 110
+
+
+State 40
+
+   96 member_func_specifier: function_specifier . const_opt throw_decl
+
+    CONST  shift, and go to state 109
+
+    $default  reduce using rule 110 (const_opt)
+
+    const_opt  go to state 111
+
+
+State 41
+
+  101 member_func_skel_spec: overloaded_op_skeleton .
+
+    $default  reduce using rule 101 (member_func_skel_spec)
+
+
+State 42
+
+  103 function_specifier: overloaded_op_specifier .
+
+    $default  reduce using rule 103 (function_specifier)
+
+
+State 43
+
+   98 member_func_specifier: destructor .
+
+    $default  reduce using rule 98 (member_func_specifier)
+
+
+State 44
+
+   95 member_func_skel: destructor_skeleton .
+
+    $default  reduce using rule 95 (member_func_skel)
+
+
+State 45
+
+   92 member_func_inlined: constructor . ':' $@3 compound_statement
+   97 member_func_specifier: constructor .
+
+    ':'  shift, and go to state 112
+
+    $default  reduce using rule 97 (member_func_specifier)
+
+
+State 46
+
+   86 function_skeleton: constructor_skeleton . ':' $@1 compound_statement
+   94 member_func_skel: constructor_skeleton .
+
+    ':'  shift, and go to state 113
+
+    $default  reduce using rule 94 (member_func_skel)
+
+
+State 47
+
+   12 type_specifier: enum_specifier .
+
+    $default  reduce using rule 12 (type_specifier)
+
+
+State 48
+
+   11 type_specifier: union_specifier .
+
+    $default  reduce using rule 11 (type_specifier)
+
+
+State 49
+
+   13 type_specifier: class_specifier .
+
+    $default  reduce using rule 13 (type_specifier)
+
+
+State 50
+
+    9 declaration_specifiers: member_specifier .
+
+    $default  reduce using rule 9 (declaration_specifiers)
+
+
+State 51
+
+  233 member_specifier: mem_type_specifier .
+  236 mem_type_specifier: mem_type_specifier . '[' ']'
+  237                   | mem_type_specifier . '[' constant_value ']'
+
+    '['  shift, and go to state 114
+
+    $default  reduce using rule 233 (member_specifier)
+
+
+State 52
+
+   87 function_skeleton: template_specifier . member_func_skel compound_statement
+   89                  | template_specifier . constructor_skeleton ':' $@2 compound_statement
+  205 class_specifier: template_specifier . CLASS IDENTIFIER '{' member_list_opt '}'
+  206                | template_specifier . CLASS IDENTIFIER ':' superclass_list '{' member_list_opt '}'
+  210                | template_specifier . STRUCT IDENTIFIER '{' member_list_opt '}'
+  211                | template_specifier . STRUCT IDENTIFIER ':' superclass_list '{' member_list_opt '}'
+
+    IDENTIFIER  shift, and go to state 115
+    CHAR        shift, and go to state 3
+    SHORT       shift, and go to state 4
+    INT         shift, and go to state 5
+    LONG        shift, and go to state 6
+    SIGNED      shift, and go to state 7
+    UNSIGNED    shift, and go to state 8
+    FLOAT       shift, and go to state 9
+    DOUBLE      shift, and go to state 10
+    VOID        shift, and go to state 11
+    CONST       shift, and go to state 14
+    CLASS       shift, and go to state 116
+    STRUCT      shift, and go to state 117
+
+    type_name               go to state 118
+    non_reference_type      go to state 28
+    simple_signed_type      go to state 29
+    simple_type_name        go to state 30
+    scoped_identifier       go to state 31
+    member_func_skel        go to state 119
+    member_func_skel_spec   go to state 39
+    overloaded_op_skeleton  go to state 41
+    destructor_skeleton     go to state 44
+    constructor_skeleton    go to state 120
+
+
+State 53
+
+   49 scoped_identifier: IDENTIFIER CLCL . IDENTIFIER
+  107 overloaded_op_skeleton: IDENTIFIER CLCL . OPERATOR type_name '(' ')'
+  118 destructor_skeleton: IDENTIFIER CLCL . '~' IDENTIFIER '(' ')'
+
+    IDENTIFIER  shift, and go to state 121
+    OPERATOR    shift, and go to state 122
+    '~'         shift, and go to state 123
+
+
+State 54
+
+   26 non_reference_type: IDENTIFIER '<' . template_instance_arg_list '>'
+   28                   | IDENTIFIER '<' . template_instance_arg_list '>' pointer
+  119 destructor_skeleton: IDENTIFIER '<' . template_instance_arg_list '>' CLCL '~' IDENTIFIER '(' ')'
+  123 constructor_skeleton: IDENTIFIER '<' . template_instance_arg_list '>' CLCL IDENTIFIER '(' parameter_list_opt ')' throw_decl
+
+    IDENTIFIER  shift, and go to state 66
+    CONSTANT    shift, and go to state 124
+    CHAR        shift, and go to state 3
+    SHORT       shift, and go to state 4
+    INT         shift, and go to state 5
+    LONG        shift, and go to state 6
+    SIGNED      shift, and go to state 7
+    UNSIGNED    shift, and go to state 8
+    FLOAT       shift, and go to state 9
+    DOUBLE      shift, and go to state 10
+    VOID        shift, and go to state 11
+    CONST       shift, and go to state 14
+    STRUCT      shift, and go to state 67
+
+    type_name                   go to state 125
+    non_reference_type          go to state 28
+    simple_signed_type          go to state 29
+    simple_type_name            go to state 30
+    scoped_identifier           go to state 69
+    template_instance_arg       go to state 126
+    template_instance_arg_list  go to state 127
+
+
+State 55
+
+   53 asterisk: '*' .
+   54         | '*' . CONST
+
+    CONST  shift, and go to state 128
+
+    $default  reduce using rule 53 (asterisk)
+
+
+State 56
+
+  121 constructor: IDENTIFIER '(' . parameter_list_opt ')' throw_decl
+
+    IDENTIFIER  shift, and go to state 66
+    CHAR        shift, and go to state 3
+    SHORT       shift, and go to state 4
+    INT         shift, and go to state 5
+    LONG        shift, and go to state 6
+    SIGNED      shift, and go to state 7
+    UNSIGNED    shift, and go to state 8
+    FLOAT       shift, and go to state 9
+    DOUBLE      shift, and go to state 10
+    VOID        shift, and go to state 11
+    CONST       shift, and go to state 14
+    STRUCT      shift, and go to state 67
+    EXTERN      shift, and go to state 129
+    ELIPSIS     shift, and go to state 130
+
+    $default  reduce using rule 72 (parameter_list_opt)
+
+    type_name              go to state 131
+    non_reference_type     go to state 28
+    simple_signed_type     go to state 29
+    simple_type_name       go to state 30
+    scoped_identifier      go to state 69
+    variable_or_parameter  go to state 32
+    variable_specifier     go to state 132
+    parameter_list_opt     go to state 133
+    parameter_list         go to state 134
+    unnamed_parameter      go to state 135
+
+
+State 57
+
+   30 non_reference_type: IDENTIFIER pointer .
+   52 pointer: pointer . asterisk
+
+    '*'  shift, and go to state 55
+
+    $default  reduce using rule 30 (non_reference_type)
+
+    asterisk  go to state 136
+
+
+State 58
+
+   51 pointer: asterisk .
+
+    $default  reduce using rule 51 (pointer)
+
+
+State 59
+
+   39 simple_type_name: SHORT INT .
+
+    $default  reduce using rule 39 (simple_type_name)
+
+
+State 60
+
+   42 simple_type_name: LONG INT .
+
+    $default  reduce using rule 42 (simple_type_name)
+
+
+State 61
+
+   43 simple_type_name: LONG LONG .
+   44                 | LONG LONG . INT
+
+    INT  shift, and go to state 137
+
+    $default  reduce using rule 43 (simple_type_name)
+
+
+State 62
+
+   45 simple_type_name: UNSIGNED .
+
+    $default  reduce using rule 45 (simple_type_name)
+
+
+State 63
+
+   35 simple_signed_type: SIGNED simple_type_name .
+
+    $default  reduce using rule 35 (simple_signed_type)
+
+
+State 64
+
+   36 simple_signed_type: UNSIGNED simple_type_name .
+
+    $default  reduce using rule 36 (simple_signed_type)
+
+
+State 65
+
+  246 template_specifier: TEMPLATE '<' . template_arg_list '>'
+
+    IDENTIFIER  shift, and go to state 66
+    CHAR        shift, and go to state 3
+    SHORT       shift, and go to state 4
+    INT         shift, and go to state 5
+    LONG        shift, and go to state 6
+    SIGNED      shift, and go to state 7
+    UNSIGNED    shift, and go to state 8
+    FLOAT       shift, and go to state 9
+    DOUBLE      shift, and go to state 10
+    VOID        shift, and go to state 11
+    CONST       shift, and go to state 14
+    CLASS       shift, and go to state 138
+    STRUCT      shift, and go to state 67
+
+    type_name           go to state 139
+    non_reference_type  go to state 28
+    simple_signed_type  go to state 29
+    simple_type_name    go to state 30
+    scoped_identifier   go to state 69
+    template_arg        go to state 140
+    template_arg_list   go to state 141
+
+
+State 66
+
+   23 non_reference_type: IDENTIFIER .
+   26                   | IDENTIFIER . '<' template_instance_arg_list '>'
+   28                   | IDENTIFIER . '<' template_instance_arg_list '>' pointer
+   30                   | IDENTIFIER . pointer
+   49 scoped_identifier: IDENTIFIER . CLCL IDENTIFIER
+
+    CLCL  shift, and go to state 142
+    '<'   shift, and go to state 143
+    '*'   shift, and go to state 55
+
+    $default  reduce using rule 23 (non_reference_type)
+
+    pointer   go to state 57
+    asterisk  go to state 58
+
+
+State 67
+
+   24 non_reference_type: STRUCT . IDENTIFIER
+   31                   | STRUCT . IDENTIFIER pointer
+
+    IDENTIFIER  shift, and go to state 144
+
+
+State 68
+
+  109 overloaded_op_specifier: OPERATOR type_name . '(' ')'
+
+    '('  shift, and go to state 145
+
+
+State 69
+
+   22 non_reference_type: scoped_identifier .
+   25                   | scoped_identifier . '<' template_instance_arg_list '>'
+   27                   | scoped_identifier . '<' template_instance_arg_list '>' pointer
+   29                   | scoped_identifier . pointer
+   50 scoped_identifier: scoped_identifier . CLCL IDENTIFIER
+
+    CLCL  shift, and go to state 146
+    '<'   shift, and go to state 147
+    '*'   shift, and go to state 55
+
+    $default  reduce using rule 22 (non_reference_type)
+
+    pointer   go to state 101
+    asterisk  go to state 58
+
+
+State 70
+
+   17 type_name: CONST non_reference_type . ampersand_opt
+
+    '&'  shift, and go to state 95
+
+    $default  reduce using rule 14 (ampersand_opt)
+
+    ampersand_opt  go to state 148
+
+
+State 71
+
+   18 forward_decl: CLASS IDENTIFIER .
+   49 scoped_identifier: IDENTIFIER . CLCL IDENTIFIER
+  203 class_specifier: CLASS IDENTIFIER . '{' member_list_opt '}'
+  204                | CLASS IDENTIFIER . ':' superclass_list '{' member_list_opt '}'
+
+    CLCL  shift, and go to state 142
+    ':'   shift, and go to state 149
+    '{'   shift, and go to state 150
+
+    $default  reduce using rule 18 (forward_decl)
+
+
+State 72
+
+   19 forward_decl: CLASS scoped_identifier .
+   50 scoped_identifier: scoped_identifier . CLCL IDENTIFIER
+
+    CLCL  shift, and go to state 146
+
+    $default  reduce using rule 19 (forward_decl)
+
+
+State 73
+
+   20 forward_decl: STRUCT IDENTIFIER .
+   24 non_reference_type: STRUCT IDENTIFIER .
+   31                   | STRUCT IDENTIFIER . pointer
+   49 scoped_identifier: IDENTIFIER . CLCL IDENTIFIER
+  208 class_specifier: STRUCT IDENTIFIER . '{' member_list_opt '}'
+  209                | STRUCT IDENTIFIER . ':' superclass_list '{' member_list_opt '}'
+
+    CLCL  shift, and go to state 142
+    '*'   shift, and go to state 55
+    ':'   shift, and go to state 151
+    '{'   shift, and go to state 152
+
+    ';'       reduce using rule 20 (forward_decl)
+    $default  reduce using rule 24 (non_reference_type)
+
+    pointer   go to state 153
+    asterisk  go to state 58
+
+
+State 74
+
+  207 class_specifier: STRUCT '{' . member_list_opt '}'
+
+    error       shift, and go to state 154
+    IDENTIFIER  shift, and go to state 80
+    CHAR        shift, and go to state 3
+    SHORT       shift, and go to state 4
+    INT         shift, and go to state 5
+    LONG        shift, and go to state 6
+    SIGNED      shift, and go to state 7
+    UNSIGNED    shift, and go to state 8
+    FLOAT       shift, and go to state 9
+    DOUBLE      shift, and go to state 10
+    VOID        shift, and go to state 11
+    TEMPLATE    shift, and go to state 12
+    FRIEND      shift, and go to state 155
+    OPERATOR    shift, and go to state 13
+    CONST       shift, and go to state 14
+    CLASS       shift, and go to state 156
+    STRUCT      shift, and go to state 157
+    UNION       shift, and go to state 17
+    ENUM        shift, and go to state 18
+    PROTECTED   shift, and go to state 158
+    PRIVATE     shift, and go to state 159
+    PUBLIC      shift, and go to state 160
+    EXTERN      shift, and go to state 161
+    ';'         shift, and go to state 162
+    '~'         shift, and go to state 21
+
+    '}'  reduce using rule 217 (member_list_opt)
+
+    type_specifier               go to state 25
+    type_name                    go to state 82
+    non_reference_type           go to state 28
+    simple_signed_type           go to state 29
+    simple_type_name             go to state 30
+    scoped_identifier            go to state 69
+    variable_or_parameter        go to state 32
+    variable_specifier           go to state 33
+    multiple_variable_specifier  go to state 34
+    member_func_inlined          go to state 163
+    member_func_specifier        go to state 38
+    function_specifier           go to state 40
+    overloaded_op_specifier      go to state 42
+    destructor                   go to state 43
+    constructor                  go to state 45
+    enum_specifier               go to state 47
+    access_specifier_list        go to state 164
+    access_specifier             go to state 165
+    union_specifier              go to state 48
+    class_specifier              go to state 49
+    friend_specifier             go to state 166
+    member_list_opt              go to state 167
+    member_list                  go to state 168
+    member_or_error              go to state 169
+    member_with_access           go to state 170
+    member                       go to state 171
+    member_specifier             go to state 172
+    mem_type_specifier           go to state 51
+    template_specifier           go to state 173
+
+
+State 75
+
+   21 forward_decl: STRUCT scoped_identifier .
+   50 scoped_identifier: scoped_identifier . CLCL IDENTIFIER
+
+    CLCL  shift, and go to state 146
+
+    $default  reduce using rule 21 (forward_decl)
+
+
+State 76
+
+  200 union_specifier: UNION IDENTIFIER . '{' variable_specifier_list '}'
+  202                | UNION IDENTIFIER .
+
+    '{'  shift, and go to state 174
+
+    $default  reduce using rule 202 (union_specifier)
+
+
+State 77
+
+  201 union_specifier: UNION '{' . variable_specifier_list '}'
+
+    IDENTIFIER  shift, and go to state 66
+    CHAR        shift, and go to state 3
+    SHORT       shift, and go to state 4
+    INT         shift, and go to state 5
+    LONG        shift, and go to state 6
+    SIGNED      shift, and go to state 7
+    UNSIGNED    shift, and go to state 8
+    FLOAT       shift, and go to state 9
+    DOUBLE      shift, and go to state 10
+    VOID        shift, and go to state 11
+    CONST       shift, and go to state 14
+    STRUCT      shift, and go to state 67
+    EXTERN      shift, and go to state 129
+
+    type_name                    go to state 175
+    non_reference_type           go to state 28
+    simple_signed_type           go to state 29
+    simple_type_name             go to state 30
+    scoped_identifier            go to state 69
+    variable_or_parameter        go to state 32
+    variable_specifier           go to state 33
+    multiple_variable_specifier  go to state 176
+    variable_specifier_list      go to state 177
+
+
+State 78
+
+  128 enum_specifier: ENUM IDENTIFIER . '{' enumerator_list '}'
+  129               | ENUM IDENTIFIER .
+
+    '{'  shift, and go to state 178
+
+    $default  reduce using rule 129 (enum_specifier)
+
+
+State 79
+
+  127 enum_specifier: ENUM '{' . enumerator_list '}'
+
+    IDENTIFIER  shift, and go to state 179
+
+    enumerator_list  go to state 180
+    enumerator       go to state 181
+
+
+State 80
+
+   23 non_reference_type: IDENTIFIER .
+   26                   | IDENTIFIER . '<' template_instance_arg_list '>'
+   28                   | IDENTIFIER . '<' template_instance_arg_list '>' pointer
+   30                   | IDENTIFIER . pointer
+   49 scoped_identifier: IDENTIFIER . CLCL IDENTIFIER
+  121 constructor: IDENTIFIER . '(' parameter_list_opt ')' throw_decl
+
+    CLCL  shift, and go to state 142
+    '<'   shift, and go to state 143
+    '*'   shift, and go to state 55
+    '('   shift, and go to state 56
+
+    $default  reduce using rule 23 (non_reference_type)
+
+    pointer   go to state 57
+    asterisk  go to state 58
+
+
+State 81
+
+    4 declaration: EXTERN STRING_LITERAL . compound_statement
+
+    '{'  shift, and go to state 105
+
+    compound_statement  go to state 182
+
+
+State 82
+
+   55 variable_or_parameter: type_name . bitfield_savvy_identifier
+   56                      | type_name . scoped_identifier
+  102 function_specifier: type_name . IDENTIFIER '(' parameter_list_opt ')'
+  108 overloaded_op_specifier: type_name . OPERATOR any_operator '(' parameter_list_opt ')'
+
+    IDENTIFIER  shift, and go to state 183
+    OPERATOR    shift, and go to state 92
+
+    scoped_identifier          go to state 184
+    bitfield_savvy_identifier  go to state 94
+
+
+State 83
+
+   57 variable_or_parameter: variable_or_parameter . '[' constant_value ']'
+   58                      | variable_or_parameter . '[' ']'
+   66 variable_specifier: EXTERN variable_or_parameter .
+
+    '['  shift, and go to state 102
+
+    $default  reduce using rule 66 (variable_specifier)
+
+
+State 84
+
+  231 member_specifier: EXTERN member_func_specifier .
+
+    $default  reduce using rule 231 (member_specifier)
+
+
+State 85
+
+   97 member_func_specifier: constructor .
+
+    $default  reduce using rule 97 (member_func_specifier)
+
+
+State 86
+
+  116 destructor: '~' IDENTIFIER . '(' ')'
+
+    '('  shift, and go to state 185
+
+
+State 87
+
+    0 $accept: translation_unit $end .
+
+    $default  accept
+
+
+State 88
+
+    2 translation_unit: translation_unit declaration .
+
+    $default  reduce using rule 2 (translation_unit)
+
+
+State 89
+
+    3 declaration: declaration_specifiers ';' .
+
+    $default  reduce using rule 3 (declaration)
+
+
+State 90
+
+  235 mem_type_specifier: type_specifier IDENTIFIER .
+
+    $default  reduce using rule 235 (mem_type_specifier)
+
+
+State 91
+
+   49 scoped_identifier: IDENTIFIER . CLCL IDENTIFIER
+   59 bitfield_savvy_identifier: IDENTIFIER .
+   60                          | IDENTIFIER . ':' CONSTANT
+  100 member_func_skel_spec: type_name IDENTIFIER . '<' template_instance_arg_list '>' CLCL IDENTIFIER '(' parameter_list_opt ')'
+  102 function_specifier: type_name IDENTIFIER . '(' parameter_list_opt ')'
+  106 overloaded_op_skeleton: type_name IDENTIFIER . CLCL OPERATOR any_operator '(' parameter_list_opt ')'
+
+    CLCL  shift, and go to state 186
+    '<'   shift, and go to state 187
+    ':'   shift, and go to state 188
+    '('   shift, and go to state 189
+
+    $default  reduce using rule 59 (bitfield_savvy_identifier)
+
+
+State 92
+
+  108 overloaded_op_specifier: type_name OPERATOR . any_operator '(' parameter_list_opt ')'
+
+    NEW           shift, and go to state 190
+    DELETE        shift, and go to state 191
+    PTR_OP        shift, and go to state 192
+    INC_OP        shift, and go to state 193
+    DEC_OP        shift, and go to state 194
+    LEFT_OP       shift, and go to state 195
+    RIGHT_OP      shift, and go to state 196
+    LE_OP         shift, and go to state 197
+    GE_OP         shift, and go to state 198
+    EQ_OP         shift, and go to state 199
+    NE_OP         shift, and go to state 200
+    AND_OP        shift, and go to state 201
+    OR_OP         shift, and go to state 202
+    MUL_ASSIGN    shift, and go to state 203
+    DIV_ASSIGN    shift, and go to state 204
+    MOD_ASSIGN    shift, and go to state 205
+    ADD_ASSIGN    shift, and go to state 206
+    SUB_ASSIGN    shift, and go to state 207
+    LEFT_ASSIGN   shift, and go to state 208
+    RIGHT_ASSIGN  shift, and go to state 209
+    AND_ASSIGN    shift, and go to state 210
+    XOR_ASSIGN    shift, and go to state 211
+    OR_ASSIGN     shift, and go to state 212
+    MEM_PTR_OP    shift, and go to state 213
+    '&'           shift, and go to state 214
+    '<'           shift, and go to state 215
+    '>'           shift, and go to state 216
+    '*'           shift, and go to state 217
+    '['           shift, and go to state 218
+    '='           shift, and go to state 219
+    ','           shift, and go to state 220
+    '('           shift, and go to state 221
+    '~'           shift, and go to state 222
+    '+'           shift, and go to state 223
+    '-'           shift, and go to state 224
+    '!'           shift, and go to state 225
+    '/'           shift, and go to state 226
+    '%'           shift, and go to state 227
+    '^'           shift, and go to state 228
+    '|'           shift, and go to state 229
+
+    unary_operator       go to state 230
+    binary_operator      go to state 231
+    assignment_operator  go to state 232
+    any_operator         go to state 233
+
+
+State 93
+
+   50 scoped_identifier: scoped_identifier . CLCL IDENTIFIER
+   56 variable_or_parameter: type_name scoped_identifier .
+   99 member_func_skel_spec: type_name scoped_identifier . '(' parameter_list_opt ')'
+  104 overloaded_op_skeleton: type_name scoped_identifier . CLCL OPERATOR any_operator '(' parameter_list_opt ')'
+
+    CLCL  shift, and go to state 234
+    '('   shift, and go to state 235
+
+    $default  reduce using rule 56 (variable_or_parameter)
+
+
+State 94
+
+   55 variable_or_parameter: type_name bitfield_savvy_identifier .
+
+    $default  reduce using rule 55 (variable_or_parameter)
+
+
+State 95
+
+   15 ampersand_opt: '&' .
+
+    $default  reduce using rule 15 (ampersand_opt)
+
+
+State 96
+
+   16 type_name: non_reference_type ampersand_opt .
+
+    $default  reduce using rule 16 (type_name)
+
+
+State 97
+
+   33 non_reference_type: simple_signed_type pointer .
+   52 pointer: pointer . asterisk
+
+    '*'  shift, and go to state 55
+
+    $default  reduce using rule 33 (non_reference_type)
+
+    asterisk  go to state 136
+
+
+State 98
+
+   50 scoped_identifier: scoped_identifier CLCL . IDENTIFIER
+  105 overloaded_op_skeleton: scoped_identifier CLCL . OPERATOR type_name '(' ')'
+  117 destructor_skeleton: scoped_identifier CLCL . '~' IDENTIFIER '(' ')'
+
+    IDENTIFIER  shift, and go to state 236
+    OPERATOR    shift, and go to state 237
+    '~'         shift, and go to state 238
+
+
+State 99
+
+   25 non_reference_type: scoped_identifier '<' . template_instance_arg_list '>'
+   27                   | scoped_identifier '<' . template_instance_arg_list '>' pointer
+  120 destructor_skeleton: scoped_identifier '<' . template_instance_arg_list '>' CLCL '~' IDENTIFIER '(' ')'
+  124 constructor_skeleton: scoped_identifier '<' . template_instance_arg_list '>' CLCL IDENTIFIER '(' parameter_list_opt ')' throw_decl
+
+    IDENTIFIER  shift, and go to state 66
+    CONSTANT    shift, and go to state 124
+    CHAR        shift, and go to state 3
+    SHORT       shift, and go to state 4
+    INT         shift, and go to state 5
+    LONG        shift, and go to state 6
+    SIGNED      shift, and go to state 7
+    UNSIGNED    shift, and go to state 8
+    FLOAT       shift, and go to state 9
+    DOUBLE      shift, and go to state 10
+    VOID        shift, and go to state 11
+    CONST       shift, and go to state 14
+    STRUCT      shift, and go to state 67
+
+    type_name                   go to state 125
+    non_reference_type          go to state 28
+    simple_signed_type          go to state 29
+    simple_type_name            go to state 30
+    scoped_identifier           go to state 69
+    template_instance_arg       go to state 126
+    template_instance_arg_list  go to state 239
+
+
+State 100
+
+  122 constructor_skeleton: scoped_identifier '(' . parameter_list_opt ')' throw_decl
+
+    IDENTIFIER  shift, and go to state 66
+    CHAR        shift, and go to state 3
+    SHORT       shift, and go to state 4
+    INT         shift, and go to state 5
+    LONG        shift, and go to state 6
+    SIGNED      shift, and go to state 7
+    UNSIGNED    shift, and go to state 8
+    FLOAT       shift, and go to state 9
+    DOUBLE      shift, and go to state 10
+    VOID        shift, and go to state 11
+    CONST       shift, and go to state 14
+    STRUCT      shift, and go to state 67
+    EXTERN      shift, and go to state 129
+    ELIPSIS     shift, and go to state 130
+
+    $default  reduce using rule 72 (parameter_list_opt)
+
+    type_name              go to state 131
+    non_reference_type     go to state 28
+    simple_signed_type     go to state 29
+    simple_type_name       go to state 30
+    scoped_identifier      go to state 69
+    variable_or_parameter  go to state 32
+    variable_specifier     go to state 132
+    parameter_list_opt     go to state 240
+    parameter_list         go to state 134
+    unnamed_parameter      go to state 135
+
+
+State 101
+
+   29 non_reference_type: scoped_identifier pointer .
+   52 pointer: pointer . asterisk
+
+    '*'  shift, and go to state 55
+
+    $default  reduce using rule 29 (non_reference_type)
+
+    asterisk  go to state 136
+
+
+State 102
+
+   57 variable_or_parameter: variable_or_parameter '[' . constant_value ']'
+   58                      | variable_or_parameter '[' . ']'
+
+    IDENTIFIER      shift, and go to state 241
+    CONSTANT        shift, and go to state 242
+    STRING_LITERAL  shift, and go to state 243
+    ']'             shift, and go to state 244
+    '('             shift, and go to state 245
+    '{'             shift, and go to state 105
+    '-'             shift, and go to state 246
+
+    scoped_identifier          go to state 247
+    compound_statement         go to state 248
+    constant_value             go to state 249
+    expression                 go to state 250
+    primary_expression         go to state 251
+    multiplicative_expression  go to state 252
+    additive_expression        go to state 253
+
+
+State 103
+
+   67 variable_specifier: variable_or_parameter '=' . constant_value
+
+    IDENTIFIER      shift, and go to state 241
+    CONSTANT        shift, and go to state 242
+    STRING_LITERAL  shift, and go to state 243
+    '('             shift, and go to state 245
+    '{'             shift, and go to state 105
+    '-'             shift, and go to state 246
+
+    scoped_identifier          go to state 247
+    compound_statement         go to state 248
+    constant_value             go to state 254
+    expression                 go to state 250
+    primary_expression         go to state 251
+    multiplicative_expression  go to state 252
+    additive_expression        go to state 253
+
+
+State 104
+
+   69 multiple_variable_specifier: multiple_variable_specifier ',' . variable_name
+
+    IDENTIFIER  shift, and go to state 255
+    '*'         shift, and go to state 55
+
+    pointer                    go to state 256
+    asterisk                   go to state 58
+    bitfield_savvy_identifier  go to state 257
+    variable_name              go to state 258
+
+
+State 105
+
+  126 compound_statement: '{' . $@4 '}'
+
+    $default  reduce using rule 125 ($@4)
+
+    $@4  go to state 259
+
+
+State 106
+
+   84 function_skeleton: member_func_skel compound_statement .
+
+    $default  reduce using rule 84 (function_skeleton)
+
+
+State 107
+
+  232 member_specifier: member_func_specifier '=' . CONSTANT
+
+    CONSTANT  shift, and go to state 260
+
+
+State 108
+
+   90 member_func_inlined: member_func_specifier compound_statement .
+
+    $default  reduce using rule 90 (member_func_inlined)
+
+
+State 109
+
+  111 const_opt: CONST .
+
+    $default  reduce using rule 111 (const_opt)
+
+
+State 110
+
+   93 member_func_skel: member_func_skel_spec const_opt . throw_decl
+
+    THROW  shift, and go to state 261
+
+    $default  reduce using rule 112 (throw_decl)
+
+    throw_decl  go to state 262
+
+
+State 111
+
+   96 member_func_specifier: function_specifier const_opt . throw_decl
+
+    THROW  shift, and go to state 261
+
+    $default  reduce using rule 112 (throw_decl)
+
+    throw_decl  go to state 263
+
+
+State 112
+
+   92 member_func_inlined: constructor ':' . $@3 compound_statement
+
+    $default  reduce using rule 91 ($@3)
+
+    $@3  go to state 264
+
+
+State 113
+
+   86 function_skeleton: constructor_skeleton ':' . $@1 compound_statement
+
+    $default  reduce using rule 85 ($@1)
+
+    $@1  go to state 265
+
+
+State 114
+
+  236 mem_type_specifier: mem_type_specifier '[' . ']'
+  237                   | mem_type_specifier '[' . constant_value ']'
+
+    IDENTIFIER      shift, and go to state 241
+    CONSTANT        shift, and go to state 242
+    STRING_LITERAL  shift, and go to state 243
+    ']'             shift, and go to state 266
+    '('             shift, and go to state 245
+    '{'             shift, and go to state 105
+    '-'             shift, and go to state 246
+
+    scoped_identifier          go to state 247
+    compound_statement         go to state 248
+    constant_value             go to state 267
+    expression                 go to state 250
+    primary_expression         go to state 251
+    multiplicative_expression  go to state 252
+    additive_expression        go to state 253
+
+
+State 115
+
+   23 non_reference_type: IDENTIFIER .
+   26                   | IDENTIFIER . '<' template_instance_arg_list '>'
+   28                   | IDENTIFIER . '<' template_instance_arg_list '>' pointer
+   30                   | IDENTIFIER . pointer
+   49 scoped_identifier: IDENTIFIER . CLCL IDENTIFIER
+  107 overloaded_op_skeleton: IDENTIFIER . CLCL OPERATOR type_name '(' ')'
+  118 destructor_skeleton: IDENTIFIER . CLCL '~' IDENTIFIER '(' ')'
+  119                    | IDENTIFIER . '<' template_instance_arg_list '>' CLCL '~' IDENTIFIER '(' ')'
+  123 constructor_skeleton: IDENTIFIER . '<' template_instance_arg_list '>' CLCL IDENTIFIER '(' parameter_list_opt ')' throw_decl
+
+    CLCL  shift, and go to state 53
+    '<'   shift, and go to state 54
+    '*'   shift, and go to state 55
+
+    $default  reduce using rule 23 (non_reference_type)
+
+    pointer   go to state 57
+    asterisk  go to state 58
+
+
+State 116
+
+  205 class_specifier: template_specifier CLASS . IDENTIFIER '{' member_list_opt '}'
+  206                | template_specifier CLASS . IDENTIFIER ':' superclass_list '{' member_list_opt '}'
+
+    IDENTIFIER  shift, and go to state 268
+
+
+State 117
+
+   24 non_reference_type: STRUCT . IDENTIFIER
+   31                   | STRUCT . IDENTIFIER pointer
+  210 class_specifier: template_specifier STRUCT . IDENTIFIER '{' member_list_opt '}'
+  211                | template_specifier STRUCT . IDENTIFIER ':' superclass_list '{' member_list_opt '}'
+
+    IDENTIFIER  shift, and go to state 269
+
+
+State 118
+
+   99 member_func_skel_spec: type_name . scoped_identifier '(' parameter_list_opt ')'
+  100                      | type_name . IDENTIFIER '<' template_instance_arg_list '>' CLCL IDENTIFIER '(' parameter_list_opt ')'
+  104 overloaded_op_skeleton: type_name . scoped_identifier CLCL OPERATOR any_operator '(' parameter_list_opt ')'
+  106                       | type_name . IDENTIFIER CLCL OPERATOR any_operator '(' parameter_list_opt ')'
+
+    IDENTIFIER  shift, and go to state 270
+
+    scoped_identifier  go to state 271
+
+
+State 119
+
+   87 function_skeleton: template_specifier member_func_skel . compound_statement
+
+    '{'  shift, and go to state 105
+
+    compound_statement  go to state 272
+
+
+State 120
+
+   89 function_skeleton: template_specifier constructor_skeleton . ':' $@2 compound_statement
+   94 member_func_skel: constructor_skeleton .
+
+    ':'  shift, and go to state 273
+
+    $default  reduce using rule 94 (member_func_skel)
+
+
+State 121
+
+   49 scoped_identifier: IDENTIFIER CLCL IDENTIFIER .
+
+    $default  reduce using rule 49 (scoped_identifier)
+
+
+State 122
+
+  107 overloaded_op_skeleton: IDENTIFIER CLCL OPERATOR . type_name '(' ')'
+
+    IDENTIFIER  shift, and go to state 66
+    CHAR        shift, and go to state 3
+    SHORT       shift, and go to state 4
+    INT         shift, and go to state 5
+    LONG        shift, and go to state 6
+    SIGNED      shift, and go to state 7
+    UNSIGNED    shift, and go to state 8
+    FLOAT       shift, and go to state 9
+    DOUBLE      shift, and go to state 10
+    VOID        shift, and go to state 11
+    CONST       shift, and go to state 14
+    STRUCT      shift, and go to state 67
+
+    type_name           go to state 274
+    non_reference_type  go to state 28
+    simple_signed_type  go to state 29
+    simple_type_name    go to state 30
+    scoped_identifier   go to state 69
+
+
+State 123
+
+  118 destructor_skeleton: IDENTIFIER CLCL '~' . IDENTIFIER '(' ')'
+
+    IDENTIFIER  shift, and go to state 275
+
+
+State 124
+
+  242 template_instance_arg: CONSTANT .
+
+    $default  reduce using rule 242 (template_instance_arg)
+
+
+State 125
+
+  243 template_instance_arg: type_name .
+
+    $default  reduce using rule 243 (template_instance_arg)
+
+
+State 126
+
+  244 template_instance_arg_list: template_instance_arg .
+
+    $default  reduce using rule 244 (template_instance_arg_list)
+
+
+State 127
+
+   26 non_reference_type: IDENTIFIER '<' template_instance_arg_list . '>'
+   28                   | IDENTIFIER '<' template_instance_arg_list . '>' pointer
+  119 destructor_skeleton: IDENTIFIER '<' template_instance_arg_list . '>' CLCL '~' IDENTIFIER '(' ')'
+  123 constructor_skeleton: IDENTIFIER '<' template_instance_arg_list . '>' CLCL IDENTIFIER '(' parameter_list_opt ')' throw_decl
+  245 template_instance_arg_list: template_instance_arg_list . ',' template_instance_arg
+
+    '>'  shift, and go to state 276
+    ','  shift, and go to state 277
+
+
+State 128
+
+   54 asterisk: '*' CONST .
+
+    $default  reduce using rule 54 (asterisk)
+
+
+State 129
+
+   66 variable_specifier: EXTERN . variable_or_parameter
+
+    IDENTIFIER  shift, and go to state 66
+    CHAR        shift, and go to state 3
+    SHORT       shift, and go to state 4
+    INT         shift, and go to state 5
+    LONG        shift, and go to state 6
+    SIGNED      shift, and go to state 7
+    UNSIGNED    shift, and go to state 8
+    FLOAT       shift, and go to state 9
+    DOUBLE      shift, and go to state 10
+    VOID        shift, and go to state 11
+    CONST       shift, and go to state 14
+    STRUCT      shift, and go to state 67
+
+    type_name              go to state 175
+    non_reference_type     go to state 28
+    simple_signed_type     go to state 29
+    simple_type_name       go to state 30
+    scoped_identifier      go to state 69
+    variable_or_parameter  go to state 83
+
+
+State 130
+
+   75 parameter_list_opt: ELIPSIS .
+
+    $default  reduce using rule 75 (parameter_list_opt)
+
+
+State 131
+
+   55 variable_or_parameter: type_name . bitfield_savvy_identifier
+   56                      | type_name . scoped_identifier
+   80 unnamed_parameter: type_name .
+   81                  | type_name . '=' constant_value
+
+    IDENTIFIER  shift, and go to state 278
+    '='         shift, and go to state 279
+
+    $default  reduce using rule 80 (unnamed_parameter)
+
+    scoped_identifier          go to state 184
+    bitfield_savvy_identifier  go to state 94
+
+
+State 132
+
+   76 parameter_list: variable_specifier .
+
+    $default  reduce using rule 76 (parameter_list)
+
+
+State 133
+
+  121 constructor: IDENTIFIER '(' parameter_list_opt . ')' throw_decl
+
+    ')'  shift, and go to state 280
+
+
+State 134
+
+   73 parameter_list_opt: parameter_list .
+   74                   | parameter_list . ',' ELIPSIS
+   78 parameter_list: parameter_list . ',' variable_specifier
+   79               | parameter_list . ',' unnamed_parameter
+
+    ','  shift, and go to state 281
+
+    $default  reduce using rule 73 (parameter_list_opt)
+
+
+State 135
+
+   77 parameter_list: unnamed_parameter .
+   82 unnamed_parameter: unnamed_parameter . '[' constant_value ']'
+   83                  | unnamed_parameter . '[' ']'
+
+    '['  shift, and go to state 282
+
+    $default  reduce using rule 77 (parameter_list)
+
+
+State 136
+
+   52 pointer: pointer asterisk .
+
+    $default  reduce using rule 52 (pointer)
+
+
+State 137
+
+   44 simple_type_name: LONG LONG INT .
+
+    $default  reduce using rule 44 (simple_type_name)
+
+
+State 138
+
+  238 template_arg: CLASS . IDENTIFIER
+
+    IDENTIFIER  shift, and go to state 283
+
+
+State 139
+
+  239 template_arg: type_name . IDENTIFIER
+
+    IDENTIFIER  shift, and go to state 284
+
+
+State 140
+
+  240 template_arg_list: template_arg .
+
+    $default  reduce using rule 240 (template_arg_list)
+
+
+State 141
+
+  241 template_arg_list: template_arg_list . ',' template_arg
+  246 template_specifier: TEMPLATE '<' template_arg_list . '>'
+
+    '>'  shift, and go to state 285
+    ','  shift, and go to state 286
+
+
+State 142
+
+   49 scoped_identifier: IDENTIFIER CLCL . IDENTIFIER
+
+    IDENTIFIER  shift, and go to state 121
+
+
+State 143
+
+   26 non_reference_type: IDENTIFIER '<' . template_instance_arg_list '>'
+   28                   | IDENTIFIER '<' . template_instance_arg_list '>' pointer
+
+    IDENTIFIER  shift, and go to state 66
+    CONSTANT    shift, and go to state 124
+    CHAR        shift, and go to state 3
+    SHORT       shift, and go to state 4
+    INT         shift, and go to state 5
+    LONG        shift, and go to state 6
+    SIGNED      shift, and go to state 7
+    UNSIGNED    shift, and go to state 8
+    FLOAT       shift, and go to state 9
+    DOUBLE      shift, and go to state 10
+    VOID        shift, and go to state 11
+    CONST       shift, and go to state 14
+    STRUCT      shift, and go to state 67
+
+    type_name                   go to state 125
+    non_reference_type          go to state 28
+    simple_signed_type          go to state 29
+    simple_type_name            go to state 30
+    scoped_identifier           go to state 69
+    template_instance_arg       go to state 126
+    template_instance_arg_list  go to state 287
+
+
+State 144
+
+   24 non_reference_type: STRUCT IDENTIFIER .
+   31                   | STRUCT IDENTIFIER . pointer
+
+    '*'  shift, and go to state 55
+
+    $default  reduce using rule 24 (non_reference_type)
+
+    pointer   go to state 153
+    asterisk  go to state 58
+
+
+State 145
+
+  109 overloaded_op_specifier: OPERATOR type_name '(' . ')'
+
+    ')'  shift, and go to state 288
+
+
+State 146
+
+   50 scoped_identifier: scoped_identifier CLCL . IDENTIFIER
+
+    IDENTIFIER  shift, and go to state 236
+
+
+State 147
+
+   25 non_reference_type: scoped_identifier '<' . template_instance_arg_list '>'
+   27                   | scoped_identifier '<' . template_instance_arg_list '>' pointer
+
+    IDENTIFIER  shift, and go to state 66
+    CONSTANT    shift, and go to state 124
+    CHAR        shift, and go to state 3
+    SHORT       shift, and go to state 4
+    INT         shift, and go to state 5
+    LONG        shift, and go to state 6
+    SIGNED      shift, and go to state 7
+    UNSIGNED    shift, and go to state 8
+    FLOAT       shift, and go to state 9
+    DOUBLE      shift, and go to state 10
+    VOID        shift, and go to state 11
+    CONST       shift, and go to state 14
+    STRUCT      shift, and go to state 67
+
+    type_name                   go to state 125
+    non_reference_type          go to state 28
+    simple_signed_type          go to state 29
+    simple_type_name            go to state 30
+    scoped_identifier           go to state 69
+    template_instance_arg       go to state 126
+    template_instance_arg_list  go to state 289
+
+
+State 148
+
+   17 type_name: CONST non_reference_type ampersand_opt .
+
+    $default  reduce using rule 17 (type_name)
+
+
+State 149
+
+  204 class_specifier: CLASS IDENTIFIER ':' . superclass_list '{' member_list_opt '}'
+
+    PROTECTED  shift, and go to state 158
+    PRIVATE    shift, and go to state 159
+    PUBLIC     shift, and go to state 160
+
+    $default  reduce using rule 134 (access_specifier_opt)
+
+    access_specifier_opt  go to state 290
+    access_specifier      go to state 291
+    superclass_list       go to state 292
+    superclass            go to state 293
+
+
+State 150
+
+  203 class_specifier: CLASS IDENTIFIER '{' . member_list_opt '}'
+
+    error       shift, and go to state 154
+    IDENTIFIER  shift, and go to state 80
+    CHAR        shift, and go to state 3
+    SHORT       shift, and go to state 4
+    INT         shift, and go to state 5
+    LONG        shift, and go to state 6
+    SIGNED      shift, and go to state 7
+    UNSIGNED    shift, and go to state 8
+    FLOAT       shift, and go to state 9
+    DOUBLE      shift, and go to state 10
+    VOID        shift, and go to state 11
+    TEMPLATE    shift, and go to state 12
+    FRIEND      shift, and go to state 155
+    OPERATOR    shift, and go to state 13
+    CONST       shift, and go to state 14
+    CLASS       shift, and go to state 156
+    STRUCT      shift, and go to state 157
+    UNION       shift, and go to state 17
+    ENUM        shift, and go to state 18
+    PROTECTED   shift, and go to state 158
+    PRIVATE     shift, and go to state 159
+    PUBLIC      shift, and go to state 160
+    EXTERN      shift, and go to state 161
+    ';'         shift, and go to state 162
+    '~'         shift, and go to state 21
+
+    '}'  reduce using rule 217 (member_list_opt)
+
+    type_specifier               go to state 25
+    type_name                    go to state 82
+    non_reference_type           go to state 28
+    simple_signed_type           go to state 29
+    simple_type_name             go to state 30
+    scoped_identifier            go to state 69
+    variable_or_parameter        go to state 32
+    variable_specifier           go to state 33
+    multiple_variable_specifier  go to state 34
+    member_func_inlined          go to state 163
+    member_func_specifier        go to state 38
+    function_specifier           go to state 40
+    overloaded_op_specifier      go to state 42
+    destructor                   go to state 43
+    constructor                  go to state 45
+    enum_specifier               go to state 47
+    access_specifier_list        go to state 164
+    access_specifier             go to state 165
+    union_specifier              go to state 48
+    class_specifier              go to state 49
+    friend_specifier             go to state 166
+    member_list_opt              go to state 294
+    member_list                  go to state 168
+    member_or_error              go to state 169
+    member_with_access           go to state 170
+    member                       go to state 171
+    member_specifier             go to state 172
+    mem_type_specifier           go to state 51
+    template_specifier           go to state 173
+
+
+State 151
+
+  209 class_specifier: STRUCT IDENTIFIER ':' . superclass_list '{' member_list_opt '}'
+
+    PROTECTED  shift, and go to state 158
+    PRIVATE    shift, and go to state 159
+    PUBLIC     shift, and go to state 160
+
+    $default  reduce using rule 134 (access_specifier_opt)
+
+    access_specifier_opt  go to state 290
+    access_specifier      go to state 291
+    superclass_list       go to state 295
+    superclass            go to state 293
+
+
+State 152
+
+  208 class_specifier: STRUCT IDENTIFIER '{' . member_list_opt '}'
+
+    error       shift, and go to state 154
+    IDENTIFIER  shift, and go to state 80
+    CHAR        shift, and go to state 3
+    SHORT       shift, and go to state 4
+    INT         shift, and go to state 5
+    LONG        shift, and go to state 6
+    SIGNED      shift, and go to state 7
+    UNSIGNED    shift, and go to state 8
+    FLOAT       shift, and go to state 9
+    DOUBLE      shift, and go to state 10
+    VOID        shift, and go to state 11
+    TEMPLATE    shift, and go to state 12
+    FRIEND      shift, and go to state 155
+    OPERATOR    shift, and go to state 13
+    CONST       shift, and go to state 14
+    CLASS       shift, and go to state 156
+    STRUCT      shift, and go to state 157
+    UNION       shift, and go to state 17
+    ENUM        shift, and go to state 18
+    PROTECTED   shift, and go to state 158
+    PRIVATE     shift, and go to state 159
+    PUBLIC      shift, and go to state 160
+    EXTERN      shift, and go to state 161
+    ';'         shift, and go to state 162
+    '~'         shift, and go to state 21
+
+    '}'  reduce using rule 217 (member_list_opt)
+
+    type_specifier               go to state 25
+    type_name                    go to state 82
+    non_reference_type           go to state 28
+    simple_signed_type           go to state 29
+    simple_type_name             go to state 30
+    scoped_identifier            go to state 69
+    variable_or_parameter        go to state 32
+    variable_specifier           go to state 33
+    multiple_variable_specifier  go to state 34
+    member_func_inlined          go to state 163
+    member_func_specifier        go to state 38
+    function_specifier           go to state 40
+    overloaded_op_specifier      go to state 42
+    destructor                   go to state 43
+    constructor                  go to state 45
+    enum_specifier               go to state 47
+    access_specifier_list        go to state 164
+    access_specifier             go to state 165
+    union_specifier              go to state 48
+    class_specifier              go to state 49
+    friend_specifier             go to state 166
+    member_list_opt              go to state 296
+    member_list                  go to state 168
+    member_or_error              go to state 169
+    member_with_access           go to state 170
+    member                       go to state 171
+    member_specifier             go to state 172
+    mem_type_specifier           go to state 51
+    template_specifier           go to state 173
+
+
+State 153
+
+   31 non_reference_type: STRUCT IDENTIFIER pointer .
+   52 pointer: pointer . asterisk
+
+    '*'  shift, and go to state 55
+
+    $default  reduce using rule 31 (non_reference_type)
+
+    asterisk  go to state 136
+
+
+State 154
+
+  222 member_or_error: error .
+
+    $default  reduce using rule 222 (member_or_error)
+
+
+State 155
+
+  215 friend_specifier: FRIEND . member_func_specifier
+  216                 | FRIEND . forward_decl
+
+    IDENTIFIER  shift, and go to state 80
+    CHAR        shift, and go to state 3
+    SHORT       shift, and go to state 4
+    INT         shift, and go to state 5
+    LONG        shift, and go to state 6
+    SIGNED      shift, and go to state 7
+    UNSIGNED    shift, and go to state 8
+    FLOAT       shift, and go to state 9
+    DOUBLE      shift, and go to state 10
+    VOID        shift, and go to state 11
+    OPERATOR    shift, and go to state 13
+    CONST       shift, and go to state 14
+    CLASS       shift, and go to state 297
+    STRUCT      shift, and go to state 298
+    '~'         shift, and go to state 21
+
+    type_name                go to state 299
+    forward_decl             go to state 300
+    non_reference_type       go to state 28
+    simple_signed_type       go to state 29
+    simple_type_name         go to state 30
+    scoped_identifier        go to state 69
+    member_func_specifier    go to state 301
+    function_specifier       go to state 40
+    overloaded_op_specifier  go to state 42
+    destructor               go to state 43
+    constructor              go to state 85
+
+
+State 156
+
+  203 class_specifier: CLASS . IDENTIFIER '{' member_list_opt '}'
+  204                | CLASS . IDENTIFIER ':' superclass_list '{' member_list_opt '}'
+
+    IDENTIFIER  shift, and go to state 302
+
+
+State 157
+
+   24 non_reference_type: STRUCT . IDENTIFIER
+   31                   | STRUCT . IDENTIFIER pointer
+  207 class_specifier: STRUCT . '{' member_list_opt '}'
+  208                | STRUCT . IDENTIFIER '{' member_list_opt '}'
+  209                | STRUCT . IDENTIFIER ':' superclass_list '{' member_list_opt '}'
+
+    IDENTIFIER  shift, and go to state 303
+    '{'         shift, and go to state 74
+
+
+State 158
+
+  140 access_specifier: PROTECTED .
+
+    $default  reduce using rule 140 (access_specifier)
+
+
+State 159
+
+  139 access_specifier: PRIVATE .
+
+    $default  reduce using rule 139 (access_specifier)
+
+
+State 160
+
+  138 access_specifier: PUBLIC .
+
+    $default  reduce using rule 138 (access_specifier)
+
+
+State 161
+
+   66 variable_specifier: EXTERN . variable_or_parameter
+  231 member_specifier: EXTERN . member_func_specifier
+
+    IDENTIFIER  shift, and go to state 80
+    CHAR        shift, and go to state 3
+    SHORT       shift, and go to state 4
+    INT         shift, and go to state 5
+    LONG        shift, and go to state 6
+    SIGNED      shift, and go to state 7
+    UNSIGNED    shift, and go to state 8
+    FLOAT       shift, and go to state 9
+    DOUBLE      shift, and go to state 10
+    VOID        shift, and go to state 11
+    OPERATOR    shift, and go to state 13
+    CONST       shift, and go to state 14
+    STRUCT      shift, and go to state 67
+    '~'         shift, and go to state 21
+
+    type_name                go to state 82
+    non_reference_type       go to state 28
+    simple_signed_type       go to state 29
+    simple_type_name         go to state 30
+    scoped_identifier        go to state 69
+    variable_or_parameter    go to state 83
+    member_func_specifier    go to state 84
+    function_specifier       go to state 40
+    overloaded_op_specifier  go to state 42
+    destructor               go to state 43
+    constructor              go to state 85
+
+
+State 162
+
+  228 member: ';' .
+
+    $default  reduce using rule 228 (member)
+
+
+State 163
+
+  227 member: member_func_inlined .
+
+    $default  reduce using rule 227 (member)
+
+
+State 164
+
+  137 access_specifier_list: access_specifier_list . access_specifier ':'
+  224 member_with_access: access_specifier_list . member_or_error
+
+    error       shift, and go to state 154
+    IDENTIFIER  shift, and go to state 80
+    CHAR        shift, and go to state 3
+    SHORT       shift, and go to state 4
+    INT         shift, and go to state 5
+    LONG        shift, and go to state 6
+    SIGNED      shift, and go to state 7
+    UNSIGNED    shift, and go to state 8
+    FLOAT       shift, and go to state 9
+    DOUBLE      shift, and go to state 10
+    VOID        shift, and go to state 11
+    TEMPLATE    shift, and go to state 12
+    FRIEND      shift, and go to state 155
+    OPERATOR    shift, and go to state 13
+    CONST       shift, and go to state 14
+    CLASS       shift, and go to state 156
+    STRUCT      shift, and go to state 157
+    UNION       shift, and go to state 17
+    ENUM        shift, and go to state 18
+    PROTECTED   shift, and go to state 158
+    PRIVATE     shift, and go to state 159
+    PUBLIC      shift, and go to state 160
+    EXTERN      shift, and go to state 161
+    ';'         shift, and go to state 162
+    '~'         shift, and go to state 21
+
+    type_specifier               go to state 25
+    type_name                    go to state 82
+    non_reference_type           go to state 28
+    simple_signed_type           go to state 29
+    simple_type_name             go to state 30
+    scoped_identifier            go to state 69
+    variable_or_parameter        go to state 32
+    variable_specifier           go to state 33
+    multiple_variable_specifier  go to state 34
+    member_func_inlined          go to state 163
+    member_func_specifier        go to state 38
+    function_specifier           go to state 40
+    overloaded_op_specifier      go to state 42
+    destructor                   go to state 43
+    constructor                  go to state 45
+    enum_specifier               go to state 47
+    access_specifier             go to state 304
+    union_specifier              go to state 48
+    class_specifier              go to state 49
+    friend_specifier             go to state 166
+    member_or_error              go to state 305
+    member                       go to state 171
+    member_specifier             go to state 172
+    mem_type_specifier           go to state 51
+    template_specifier           go to state 173
+
+
+State 165
+
+  136 access_specifier_list: access_specifier . ':'
+
+    ':'  shift, and go to state 306
+
+
+State 166
+
+  226 member: friend_specifier . ';'
+
+    ';'  shift, and go to state 307
+
+
+State 167
+
+  207 class_specifier: STRUCT '{' member_list_opt . '}'
+
+    '}'  shift, and go to state 308
+
+
+State 168
+
+  218 member_list_opt: member_list .
+  220 member_list: member_list . member_with_access
+
+    error       shift, and go to state 154
+    IDENTIFIER  shift, and go to state 80
+    CHAR        shift, and go to state 3
+    SHORT       shift, and go to state 4
+    INT         shift, and go to state 5
+    LONG        shift, and go to state 6
+    SIGNED      shift, and go to state 7
+    UNSIGNED    shift, and go to state 8
+    FLOAT       shift, and go to state 9
+    DOUBLE      shift, and go to state 10
+    VOID        shift, and go to state 11
+    TEMPLATE    shift, and go to state 12
+    FRIEND      shift, and go to state 155
+    OPERATOR    shift, and go to state 13
+    CONST       shift, and go to state 14
+    CLASS       shift, and go to state 156
+    STRUCT      shift, and go to state 157
+    UNION       shift, and go to state 17
+    ENUM        shift, and go to state 18
+    PROTECTED   shift, and go to state 158
+    PRIVATE     shift, and go to state 159
+    PUBLIC      shift, and go to state 160
+    EXTERN      shift, and go to state 161
+    ';'         shift, and go to state 162
+    '~'         shift, and go to state 21
+
+    '}'  reduce using rule 218 (member_list_opt)
+
+    type_specifier               go to state 25
+    type_name                    go to state 82
+    non_reference_type           go to state 28
+    simple_signed_type           go to state 29
+    simple_type_name             go to state 30
+    scoped_identifier            go to state 69
+    variable_or_parameter        go to state 32
+    variable_specifier           go to state 33
+    multiple_variable_specifier  go to state 34
+    member_func_inlined          go to state 163
+    member_func_specifier        go to state 38
+    function_specifier           go to state 40
+    overloaded_op_specifier      go to state 42
+    destructor                   go to state 43
+    constructor                  go to state 45
+    enum_specifier               go to state 47
+    access_specifier_list        go to state 164
+    access_specifier             go to state 165
+    union_specifier              go to state 48
+    class_specifier              go to state 49
+    friend_specifier             go to state 166
+    member_or_error              go to state 169
+    member_with_access           go to state 309
+    member                       go to state 171
+    member_specifier             go to state 172
+    mem_type_specifier           go to state 51
+    template_specifier           go to state 173
+
+
+State 169
+
+  223 member_with_access: member_or_error .
+
+    $default  reduce using rule 223 (member_with_access)
+
+
+State 170
+
+  219 member_list: member_with_access .
+
+    $default  reduce using rule 219 (member_list)
+
+
+State 171
+
+  221 member_or_error: member .
+
+    $default  reduce using rule 221 (member_or_error)
+
+
+State 172
+
+  225 member: member_specifier . ';'
+
+    ';'  shift, and go to state 310
+
+
+State 173
+
+  205 class_specifier: template_specifier . CLASS IDENTIFIER '{' member_list_opt '}'
+  206                | template_specifier . CLASS IDENTIFIER ':' superclass_list '{' member_list_opt '}'
+  210                | template_specifier . STRUCT IDENTIFIER '{' member_list_opt '}'
+  211                | template_specifier . STRUCT IDENTIFIER ':' superclass_list '{' member_list_opt '}'
+
+    CLASS   shift, and go to state 116
+    STRUCT  shift, and go to state 311
+
+
+State 174
+
+  200 union_specifier: UNION IDENTIFIER '{' . variable_specifier_list '}'
+
+    IDENTIFIER  shift, and go to state 66
+    CHAR        shift, and go to state 3
+    SHORT       shift, and go to state 4
+    INT         shift, and go to state 5
+    LONG        shift, and go to state 6
+    SIGNED      shift, and go to state 7
+    UNSIGNED    shift, and go to state 8
+    FLOAT       shift, and go to state 9
+    DOUBLE      shift, and go to state 10
+    VOID        shift, and go to state 11
+    CONST       shift, and go to state 14
+    STRUCT      shift, and go to state 67
+    EXTERN      shift, and go to state 129
+
+    type_name                    go to state 175
+    non_reference_type           go to state 28
+    simple_signed_type           go to state 29
+    simple_type_name             go to state 30
+    scoped_identifier            go to state 69
+    variable_or_parameter        go to state 32
+    variable_specifier           go to state 33
+    multiple_variable_specifier  go to state 176
+    variable_specifier_list      go to state 312
+
+
+State 175
+
+   55 variable_or_parameter: type_name . bitfield_savvy_identifier
+   56                      | type_name . scoped_identifier
+
+    IDENTIFIER  shift, and go to state 278
+
+    scoped_identifier          go to state 184
+    bitfield_savvy_identifier  go to state 94
+
+
+State 176
+
+   69 multiple_variable_specifier: multiple_variable_specifier . ',' variable_name
+   70 variable_specifier_list: multiple_variable_specifier . ';'
+
+    ';'  shift, and go to state 313
+    ','  shift, and go to state 104
+
+
+State 177
+
+   71 variable_specifier_list: variable_specifier_list . multiple_variable_specifier ';'
+  201 union_specifier: UNION '{' variable_specifier_list . '}'
+
+    IDENTIFIER  shift, and go to state 66
+    CHAR        shift, and go to state 3
+    SHORT       shift, and go to state 4
+    INT         shift, and go to state 5
+    LONG        shift, and go to state 6
+    SIGNED      shift, and go to state 7
+    UNSIGNED    shift, and go to state 8
+    FLOAT       shift, and go to state 9
+    DOUBLE      shift, and go to state 10
+    VOID        shift, and go to state 11
+    CONST       shift, and go to state 14
+    STRUCT      shift, and go to state 67
+    EXTERN      shift, and go to state 129
+    '}'         shift, and go to state 314
+
+    type_name                    go to state 175
+    non_reference_type           go to state 28
+    simple_signed_type           go to state 29
+    simple_type_name             go to state 30
+    scoped_identifier            go to state 69
+    variable_or_parameter        go to state 32
+    variable_specifier           go to state 33
+    multiple_variable_specifier  go to state 315
+
+
+State 178
+
+  128 enum_specifier: ENUM IDENTIFIER '{' . enumerator_list '}'
+
+    IDENTIFIER  shift, and go to state 179
+
+    enumerator_list  go to state 316
+    enumerator       go to state 181
+
+
+State 179
+
+  132 enumerator: IDENTIFIER .
+  133           | IDENTIFIER . '=' constant_value
+
+    '='  shift, and go to state 317
+
+    $default  reduce using rule 132 (enumerator)
+
+
+State 180
+
+  127 enum_specifier: ENUM '{' enumerator_list . '}'
+  131 enumerator_list: enumerator_list . ',' enumerator
+
+    ','  shift, and go to state 318
+    '}'  shift, and go to state 319
+
+
+State 181
+
+  130 enumerator_list: enumerator .
+
+    $default  reduce using rule 130 (enumerator_list)
+
+
+State 182
+
+    4 declaration: EXTERN STRING_LITERAL compound_statement .
+
+    $default  reduce using rule 4 (declaration)
+
+
+State 183
+
+   49 scoped_identifier: IDENTIFIER . CLCL IDENTIFIER
+   59 bitfield_savvy_identifier: IDENTIFIER .
+   60                          | IDENTIFIER . ':' CONSTANT
+  102 function_specifier: type_name IDENTIFIER . '(' parameter_list_opt ')'
+
+    CLCL  shift, and go to state 142
+    ':'   shift, and go to state 188
+    '('   shift, and go to state 189
+
+    $default  reduce using rule 59 (bitfield_savvy_identifier)
+
+
+State 184
+
+   50 scoped_identifier: scoped_identifier . CLCL IDENTIFIER
+   56 variable_or_parameter: type_name scoped_identifier .
+
+    CLCL  shift, and go to state 146
+
+    $default  reduce using rule 56 (variable_or_parameter)
+
+
+State 185
+
+  116 destructor: '~' IDENTIFIER '(' . ')'
+
+    ')'  shift, and go to state 320
+
+
+State 186
+
+   49 scoped_identifier: IDENTIFIER CLCL . IDENTIFIER
+  106 overloaded_op_skeleton: type_name IDENTIFIER CLCL . OPERATOR any_operator '(' parameter_list_opt ')'
+
+    IDENTIFIER  shift, and go to state 121
+    OPERATOR    shift, and go to state 321
+
+
+State 187
+
+  100 member_func_skel_spec: type_name IDENTIFIER '<' . template_instance_arg_list '>' CLCL IDENTIFIER '(' parameter_list_opt ')'
+
+    IDENTIFIER  shift, and go to state 66
+    CONSTANT    shift, and go to state 124
+    CHAR        shift, and go to state 3
+    SHORT       shift, and go to state 4
+    INT         shift, and go to state 5
+    LONG        shift, and go to state 6
+    SIGNED      shift, and go to state 7
+    UNSIGNED    shift, and go to state 8
+    FLOAT       shift, and go to state 9
+    DOUBLE      shift, and go to state 10
+    VOID        shift, and go to state 11
+    CONST       shift, and go to state 14
+    STRUCT      shift, and go to state 67
+
+    type_name                   go to state 125
+    non_reference_type          go to state 28
+    simple_signed_type          go to state 29
+    simple_type_name            go to state 30
+    scoped_identifier           go to state 69
+    template_instance_arg       go to state 126
+    template_instance_arg_list  go to state 322
+
+
+State 188
+
+   60 bitfield_savvy_identifier: IDENTIFIER ':' . CONSTANT
+
+    CONSTANT  shift, and go to state 323
+
+
+State 189
+
+  102 function_specifier: type_name IDENTIFIER '(' . parameter_list_opt ')'
+
+    IDENTIFIER  shift, and go to state 66
+    CHAR        shift, and go to state 3
+    SHORT       shift, and go to state 4
+    INT         shift, and go to state 5
+    LONG        shift, and go to state 6
+    SIGNED      shift, and go to state 7
+    UNSIGNED    shift, and go to state 8
+    FLOAT       shift, and go to state 9
+    DOUBLE      shift, and go to state 10
+    VOID        shift, and go to state 11
+    CONST       shift, and go to state 14
+    STRUCT      shift, and go to state 67
+    EXTERN      shift, and go to state 129
+    ELIPSIS     shift, and go to state 130
+
+    $default  reduce using rule 72 (parameter_list_opt)
+
+    type_name              go to state 131
+    non_reference_type     go to state 28
+    simple_signed_type     go to state 29
+    simple_type_name       go to state 30
+    scoped_identifier      go to state 69
+    variable_or_parameter  go to state 32
+    variable_specifier     go to state 132
+    parameter_list_opt     go to state 324
+    parameter_list         go to state 134
+    unnamed_parameter      go to state 135
+
+
+State 190
+
+  168 any_operator: NEW .
+
+    $default  reduce using rule 168 (any_operator)
+
+
+State 191
+
+  169 any_operator: DELETE .
+
+    $default  reduce using rule 169 (any_operator)
+
+
+State 192
+
+  170 any_operator: PTR_OP .
+
+    $default  reduce using rule 170 (any_operator)
+
+
+State 193
+
+  172 any_operator: INC_OP .
+
+    $default  reduce using rule 172 (any_operator)
+
+
+State 194
+
+  173 any_operator: DEC_OP .
+
+    $default  reduce using rule 173 (any_operator)
+
+
+State 195
+
+  174 any_operator: LEFT_OP .
+
+    $default  reduce using rule 174 (any_operator)
+
+
+State 196
+
+  175 any_operator: RIGHT_OP .
+
+    $default  reduce using rule 175 (any_operator)
+
+
+State 197
+
+  176 any_operator: LE_OP .
+
+    $default  reduce using rule 176 (any_operator)
+
+
+State 198
+
+  177 any_operator: GE_OP .
+
+    $default  reduce using rule 177 (any_operator)
+
+
+State 199
+
+  178 any_operator: EQ_OP .
+
+    $default  reduce using rule 178 (any_operator)
+
+
+State 200
+
+  179 any_operator: NE_OP .
+
+    $default  reduce using rule 179 (any_operator)
+
+
+State 201
+
+  180 any_operator: AND_OP .
+
+    $default  reduce using rule 180 (any_operator)
+
+
+State 202
+
+  181 any_operator: OR_OP .
+
+    $default  reduce using rule 181 (any_operator)
+
+
+State 203
+
+  155 assignment_operator: MUL_ASSIGN .
+
+    $default  reduce using rule 155 (assignment_operator)
+
+
+State 204
+
+  156 assignment_operator: DIV_ASSIGN .
+
+    $default  reduce using rule 156 (assignment_operator)
+
+
+State 205
+
+  157 assignment_operator: MOD_ASSIGN .
+
+    $default  reduce using rule 157 (assignment_operator)
+
+
+State 206
+
+  158 assignment_operator: ADD_ASSIGN .
+
+    $default  reduce using rule 158 (assignment_operator)
+
+
+State 207
+
+  159 assignment_operator: SUB_ASSIGN .
+
+    $default  reduce using rule 159 (assignment_operator)
+
+
+State 208
+
+  160 assignment_operator: LEFT_ASSIGN .
+
+    $default  reduce using rule 160 (assignment_operator)
+
+
+State 209
+
+  161 assignment_operator: RIGHT_ASSIGN .
+
+    $default  reduce using rule 161 (assignment_operator)
+
+
+State 210
+
+  162 assignment_operator: AND_ASSIGN .
+
+    $default  reduce using rule 162 (assignment_operator)
+
+
+State 211
+
+  163 assignment_operator: XOR_ASSIGN .
+
+    $default  reduce using rule 163 (assignment_operator)
+
+
+State 212
+
+  164 assignment_operator: OR_ASSIGN .
+
+    $default  reduce using rule 164 (assignment_operator)
+
+
+State 213
+
+  171 any_operator: MEM_PTR_OP .
+
+    $default  reduce using rule 171 (any_operator)
+
+
+State 214
+
+  141 unary_operator: '&' .
+
+    $default  reduce using rule 141 (unary_operator)
+
+
+State 215
+
+  151 binary_operator: '<' .
+
+    $default  reduce using rule 151 (binary_operator)
+
+
+State 216
+
+  152 binary_operator: '>' .
+
+    $default  reduce using rule 152 (binary_operator)
+
+
+State 217
+
+  142 unary_operator: '*' .
+
+    $default  reduce using rule 142 (unary_operator)
+
+
+State 218
+
+  182 any_operator: '[' . ']'
+
+    ']'  shift, and go to state 325
+
+
+State 219
+
+  154 assignment_operator: '=' .
+
+    $default  reduce using rule 154 (assignment_operator)
+
+
+State 220
+
+  153 binary_operator: ',' .
+
+    $default  reduce using rule 153 (binary_operator)
+
+
+State 221
+
+  183 any_operator: '(' . ')'
+
+    ')'  shift, and go to state 326
+
+
+State 222
+
+  145 unary_operator: '~' .
+
+    $default  reduce using rule 145 (unary_operator)
+
+
+State 223
+
+  143 unary_operator: '+' .
+
+    $default  reduce using rule 143 (unary_operator)
+
+
+State 224
+
+  144 unary_operator: '-' .
+
+    $default  reduce using rule 144 (unary_operator)
+
+
+State 225
+
+  146 unary_operator: '!' .
+
+    $default  reduce using rule 146 (unary_operator)
+
+
+State 226
+
+  147 binary_operator: '/' .
+
+    $default  reduce using rule 147 (binary_operator)
+
+
+State 227
+
+  148 binary_operator: '%' .
+
+    $default  reduce using rule 148 (binary_operator)
+
+
+State 228
+
+  149 binary_operator: '^' .
+
+    $default  reduce using rule 149 (binary_operator)
+
+
+State 229
+
+  150 binary_operator: '|' .
+
+    $default  reduce using rule 150 (binary_operator)
+
+
+State 230
+
+  166 any_operator: unary_operator .
+
+    $default  reduce using rule 166 (any_operator)
+
+
+State 231
+
+  167 any_operator: binary_operator .
+
+    $default  reduce using rule 167 (any_operator)
+
+
+State 232
+
+  165 any_operator: assignment_operator .
+
+    $default  reduce using rule 165 (any_operator)
+
+
+State 233
+
+  108 overloaded_op_specifier: type_name OPERATOR any_operator . '(' parameter_list_opt ')'
+
+    '('  shift, and go to state 327
+
+
+State 234
+
+   50 scoped_identifier: scoped_identifier CLCL . IDENTIFIER
+  104 overloaded_op_skeleton: type_name scoped_identifier CLCL . OPERATOR any_operator '(' parameter_list_opt ')'
+
+    IDENTIFIER  shift, and go to state 236
+    OPERATOR    shift, and go to state 328
+
+
+State 235
+
+   99 member_func_skel_spec: type_name scoped_identifier '(' . parameter_list_opt ')'
+
+    IDENTIFIER  shift, and go to state 66
+    CHAR        shift, and go to state 3
+    SHORT       shift, and go to state 4
+    INT         shift, and go to state 5
+    LONG        shift, and go to state 6
+    SIGNED      shift, and go to state 7
+    UNSIGNED    shift, and go to state 8
+    FLOAT       shift, and go to state 9
+    DOUBLE      shift, and go to state 10
+    VOID        shift, and go to state 11
+    CONST       shift, and go to state 14
+    STRUCT      shift, and go to state 67
+    EXTERN      shift, and go to state 129
+    ELIPSIS     shift, and go to state 130
+
+    $default  reduce using rule 72 (parameter_list_opt)
+
+    type_name              go to state 131
+    non_reference_type     go to state 28
+    simple_signed_type     go to state 29
+    simple_type_name       go to state 30
+    scoped_identifier      go to state 69
+    variable_or_parameter  go to state 32
+    variable_specifier     go to state 132
+    parameter_list_opt     go to state 329
+    parameter_list         go to state 134
+    unnamed_parameter      go to state 135
+
+
+State 236
+
+   50 scoped_identifier: scoped_identifier CLCL IDENTIFIER .
+
+    $default  reduce using rule 50 (scoped_identifier)
+
+
+State 237
+
+  105 overloaded_op_skeleton: scoped_identifier CLCL OPERATOR . type_name '(' ')'
+
+    IDENTIFIER  shift, and go to state 66
+    CHAR        shift, and go to state 3
+    SHORT       shift, and go to state 4
+    INT         shift, and go to state 5
+    LONG        shift, and go to state 6
+    SIGNED      shift, and go to state 7
+    UNSIGNED    shift, and go to state 8
+    FLOAT       shift, and go to state 9
+    DOUBLE      shift, and go to state 10
+    VOID        shift, and go to state 11
+    CONST       shift, and go to state 14
+    STRUCT      shift, and go to state 67
+
+    type_name           go to state 330
+    non_reference_type  go to state 28
+    simple_signed_type  go to state 29
+    simple_type_name    go to state 30
+    scoped_identifier   go to state 69
+
+
+State 238
+
+  117 destructor_skeleton: scoped_identifier CLCL '~' . IDENTIFIER '(' ')'
+
+    IDENTIFIER  shift, and go to state 331
+
+
+State 239
+
+   25 non_reference_type: scoped_identifier '<' template_instance_arg_list . '>'
+   27                   | scoped_identifier '<' template_instance_arg_list . '>' pointer
+  120 destructor_skeleton: scoped_identifier '<' template_instance_arg_list . '>' CLCL '~' IDENTIFIER '(' ')'
+  124 constructor_skeleton: scoped_identifier '<' template_instance_arg_list . '>' CLCL IDENTIFIER '(' parameter_list_opt ')' throw_decl
+  245 template_instance_arg_list: template_instance_arg_list . ',' template_instance_arg
+
+    '>'  shift, and go to state 332
+    ','  shift, and go to state 277
+
+
+State 240
+
+  122 constructor_skeleton: scoped_identifier '(' parameter_list_opt . ')' throw_decl
+
+    ')'  shift, and go to state 333
+
+
+State 241
+
+   49 scoped_identifier: IDENTIFIER . CLCL IDENTIFIER
+  190 primary_expression: IDENTIFIER .
+
+    CLCL  shift, and go to state 142
+
+    $default  reduce using rule 190 (primary_expression)
+
+
+State 242
+
+  187 primary_expression: CONSTANT .
+
+    $default  reduce using rule 187 (primary_expression)
+
+
+State 243
+
+  189 primary_expression: STRING_LITERAL .
+
+    $default  reduce using rule 189 (primary_expression)
+
+
+State 244
+
+   58 variable_or_parameter: variable_or_parameter '[' ']' .
+
+    $default  reduce using rule 58 (variable_or_parameter)
+
+
+State 245
+
+  192 primary_expression: '(' . expression ')'
+
+    IDENTIFIER      shift, and go to state 241
+    CONSTANT        shift, and go to state 242
+    STRING_LITERAL  shift, and go to state 243
+    '('             shift, and go to state 245
+    '-'             shift, and go to state 246
+
+    scoped_identifier          go to state 247
+    expression                 go to state 334
+    primary_expression         go to state 251
+    multiplicative_expression  go to state 252
+    additive_expression        go to state 253
+
+
+State 246
+
+  188 primary_expression: '-' . CONSTANT
+
+    CONSTANT  shift, and go to state 335
+
+
+State 247
+
+   50 scoped_identifier: scoped_identifier . CLCL IDENTIFIER
+  191 primary_expression: scoped_identifier .
+
+    CLCL  shift, and go to state 146
+
+    $default  reduce using rule 191 (primary_expression)
+
+
+State 248
+
+  185 constant_value: compound_statement .
+
+    $default  reduce using rule 185 (constant_value)
+
+
+State 249
+
+   57 variable_or_parameter: variable_or_parameter '[' constant_value . ']'
+
+    ']'  shift, and go to state 336
+
+
+State 250
+
+  184 constant_value: expression .
+
+    $default  reduce using rule 184 (constant_value)
+
+
+State 251
+
+  193 multiplicative_expression: primary_expression .
+
+    $default  reduce using rule 193 (multiplicative_expression)
+
+
+State 252
+
+  194 multiplicative_expression: multiplicative_expression . '*' primary_expression
+  195                          | multiplicative_expression . '/' primary_expression
+  196                          | multiplicative_expression . '%' primary_expression
+  197 additive_expression: multiplicative_expression .
+
+    '*'  shift, and go to state 337
+    '/'  shift, and go to state 338
+    '%'  shift, and go to state 339
+
+    $default  reduce using rule 197 (additive_expression)
+
+
+State 253
+
+  186 expression: additive_expression .
+  198 additive_expression: additive_expression . '+' multiplicative_expression
+  199                    | additive_expression . '-' multiplicative_expression
+
+    '+'  shift, and go to state 340
+    '-'  shift, and go to state 341
+
+    $default  reduce using rule 186 (expression)
+
+
+State 254
+
+   67 variable_specifier: variable_or_parameter '=' constant_value .
+
+    $default  reduce using rule 67 (variable_specifier)
+
+
+State 255
+
+   59 bitfield_savvy_identifier: IDENTIFIER .
+   60                          | IDENTIFIER . ':' CONSTANT
+
+    ':'  shift, and go to state 188
+
+    $default  reduce using rule 59 (bitfield_savvy_identifier)
+
+
+State 256
+
+   52 pointer: pointer . asterisk
+   62 variable_name: pointer . IDENTIFIER
+
+    IDENTIFIER  shift, and go to state 342
+    '*'         shift, and go to state 55
+
+    asterisk  go to state 136
+
+
+State 257
+
+   61 variable_name: bitfield_savvy_identifier .
+
+    $default  reduce using rule 61 (variable_name)
+
+
+State 258
+
+   63 variable_name: variable_name . '[' constant_value ']'
+   64              | variable_name . '[' ']'
+   69 multiple_variable_specifier: multiple_variable_specifier ',' variable_name .
+
+    '['  shift, and go to state 343
+
+    $default  reduce using rule 69 (multiple_variable_specifier)
+
+
+State 259
+
+  126 compound_statement: '{' $@4 . '}'
+
+    '}'  shift, and go to state 344
+
+
+State 260
+
+  232 member_specifier: member_func_specifier '=' CONSTANT .
+
+    $default  reduce using rule 232 (member_specifier)
+
+
+State 261
+
+  113 throw_decl: THROW . '(' throw_list ')'
+
+    '('  shift, and go to state 345
+
+
+State 262
+
+   93 member_func_skel: member_func_skel_spec const_opt throw_decl .
+
+    $default  reduce using rule 93 (member_func_skel)
+
+
+State 263
+
+   96 member_func_specifier: function_specifier const_opt throw_decl .
+
+    $default  reduce using rule 96 (member_func_specifier)
+
+
+State 264
+
+   92 member_func_inlined: constructor ':' $@3 . compound_statement
+
+    '{'  shift, and go to state 105
+
+    compound_statement  go to state 346
+
+
+State 265
+
+   86 function_skeleton: constructor_skeleton ':' $@1 . compound_statement
+
+    '{'  shift, and go to state 105
+
+    compound_statement  go to state 347
+
+
+State 266
+
+  236 mem_type_specifier: mem_type_specifier '[' ']' .
+
+    $default  reduce using rule 236 (mem_type_specifier)
+
+
+State 267
+
+  237 mem_type_specifier: mem_type_specifier '[' constant_value . ']'
+
+    ']'  shift, and go to state 348
+
+
+State 268
+
+  205 class_specifier: template_specifier CLASS IDENTIFIER . '{' member_list_opt '}'
+  206                | template_specifier CLASS IDENTIFIER . ':' superclass_list '{' member_list_opt '}'
+
+    ':'  shift, and go to state 349
+    '{'  shift, and go to state 350
+
+
+State 269
+
+   24 non_reference_type: STRUCT IDENTIFIER .
+   31                   | STRUCT IDENTIFIER . pointer
+  210 class_specifier: template_specifier STRUCT IDENTIFIER . '{' member_list_opt '}'
+  211                | template_specifier STRUCT IDENTIFIER . ':' superclass_list '{' member_list_opt '}'
+
+    '*'  shift, and go to state 55
+    ':'  shift, and go to state 351
+    '{'  shift, and go to state 352
+
+    $default  reduce using rule 24 (non_reference_type)
+
+    pointer   go to state 153
+    asterisk  go to state 58
+
+
+State 270
+
+   49 scoped_identifier: IDENTIFIER . CLCL IDENTIFIER
+  100 member_func_skel_spec: type_name IDENTIFIER . '<' template_instance_arg_list '>' CLCL IDENTIFIER '(' parameter_list_opt ')'
+  106 overloaded_op_skeleton: type_name IDENTIFIER . CLCL OPERATOR any_operator '(' parameter_list_opt ')'
+
+    CLCL  shift, and go to state 186
+    '<'   shift, and go to state 187
+
+
+State 271
+
+   50 scoped_identifier: scoped_identifier . CLCL IDENTIFIER
+   99 member_func_skel_spec: type_name scoped_identifier . '(' parameter_list_opt ')'
+  104 overloaded_op_skeleton: type_name scoped_identifier . CLCL OPERATOR any_operator '(' parameter_list_opt ')'
+
+    CLCL  shift, and go to state 234
+    '('   shift, and go to state 235
+
+
+State 272
+
+   87 function_skeleton: template_specifier member_func_skel compound_statement .
+
+    $default  reduce using rule 87 (function_skeleton)
+
+
+State 273
+
+   89 function_skeleton: template_specifier constructor_skeleton ':' . $@2 compound_statement
+
+    $default  reduce using rule 88 ($@2)
+
+    $@2  go to state 353
+
+
+State 274
+
+  107 overloaded_op_skeleton: IDENTIFIER CLCL OPERATOR type_name . '(' ')'
+
+    '('  shift, and go to state 354
+
+
+State 275
+
+  118 destructor_skeleton: IDENTIFIER CLCL '~' IDENTIFIER . '(' ')'
+
+    '('  shift, and go to state 355
+
+
+State 276
+
+   26 non_reference_type: IDENTIFIER '<' template_instance_arg_list '>' .
+   28                   | IDENTIFIER '<' template_instance_arg_list '>' . pointer
+  119 destructor_skeleton: IDENTIFIER '<' template_instance_arg_list '>' . CLCL '~' IDENTIFIER '(' ')'
+  123 constructor_skeleton: IDENTIFIER '<' template_instance_arg_list '>' . CLCL IDENTIFIER '(' parameter_list_opt ')' throw_decl
+
+    CLCL  shift, and go to state 356
+    '*'   shift, and go to state 55
+
+    $default  reduce using rule 26 (non_reference_type)
+
+    pointer   go to state 357
+    asterisk  go to state 58
+
+
+State 277
+
+  245 template_instance_arg_list: template_instance_arg_list ',' . template_instance_arg
+
+    IDENTIFIER  shift, and go to state 66
+    CONSTANT    shift, and go to state 124
+    CHAR        shift, and go to state 3
+    SHORT       shift, and go to state 4
+    INT         shift, and go to state 5
+    LONG        shift, and go to state 6
+    SIGNED      shift, and go to state 7
+    UNSIGNED    shift, and go to state 8
+    FLOAT       shift, and go to state 9
+    DOUBLE      shift, and go to state 10
+    VOID        shift, and go to state 11
+    CONST       shift, and go to state 14
+    STRUCT      shift, and go to state 67
+
+    type_name              go to state 125
+    non_reference_type     go to state 28
+    simple_signed_type     go to state 29
+    simple_type_name       go to state 30
+    scoped_identifier      go to state 69
+    template_instance_arg  go to state 358
+
+
+State 278
+
+   49 scoped_identifier: IDENTIFIER . CLCL IDENTIFIER
+   59 bitfield_savvy_identifier: IDENTIFIER .
+   60                          | IDENTIFIER . ':' CONSTANT
+
+    CLCL  shift, and go to state 142
+    ':'   shift, and go to state 188
+
+    $default  reduce using rule 59 (bitfield_savvy_identifier)
+
+
+State 279
+
+   81 unnamed_parameter: type_name '=' . constant_value
+
+    IDENTIFIER      shift, and go to state 241
+    CONSTANT        shift, and go to state 242
+    STRING_LITERAL  shift, and go to state 243
+    '('             shift, and go to state 245
+    '{'             shift, and go to state 105
+    '-'             shift, and go to state 246
+
+    scoped_identifier          go to state 247
+    compound_statement         go to state 248
+    constant_value             go to state 359
+    expression                 go to state 250
+    primary_expression         go to state 251
+    multiplicative_expression  go to state 252
+    additive_expression        go to state 253
+
+
+State 280
+
+  121 constructor: IDENTIFIER '(' parameter_list_opt ')' . throw_decl
+
+    THROW  shift, and go to state 261
+
+    $default  reduce using rule 112 (throw_decl)
+
+    throw_decl  go to state 360
+
+
+State 281
+
+   74 parameter_list_opt: parameter_list ',' . ELIPSIS
+   78 parameter_list: parameter_list ',' . variable_specifier
+   79               | parameter_list ',' . unnamed_parameter
+
+    IDENTIFIER  shift, and go to state 66
+    CHAR        shift, and go to state 3
+    SHORT       shift, and go to state 4
+    INT         shift, and go to state 5
+    LONG        shift, and go to state 6
+    SIGNED      shift, and go to state 7
+    UNSIGNED    shift, and go to state 8
+    FLOAT       shift, and go to state 9
+    DOUBLE      shift, and go to state 10
+    VOID        shift, and go to state 11
+    CONST       shift, and go to state 14
+    STRUCT      shift, and go to state 67
+    EXTERN      shift, and go to state 129
+    ELIPSIS     shift, and go to state 361
+
+    type_name              go to state 131
+    non_reference_type     go to state 28
+    simple_signed_type     go to state 29
+    simple_type_name       go to state 30
+    scoped_identifier      go to state 69
+    variable_or_parameter  go to state 32
+    variable_specifier     go to state 362
+    unnamed_parameter      go to state 363
+
+
+State 282
+
+   82 unnamed_parameter: unnamed_parameter '[' . constant_value ']'
+   83                  | unnamed_parameter '[' . ']'
+
+    IDENTIFIER      shift, and go to state 241
+    CONSTANT        shift, and go to state 242
+    STRING_LITERAL  shift, and go to state 243
+    ']'             shift, and go to state 364
+    '('             shift, and go to state 245
+    '{'             shift, and go to state 105
+    '-'             shift, and go to state 246
+
+    scoped_identifier          go to state 247
+    compound_statement         go to state 248
+    constant_value             go to state 365
+    expression                 go to state 250
+    primary_expression         go to state 251
+    multiplicative_expression  go to state 252
+    additive_expression        go to state 253
+
+
+State 283
+
+  238 template_arg: CLASS IDENTIFIER .
+
+    $default  reduce using rule 238 (template_arg)
+
+
+State 284
+
+  239 template_arg: type_name IDENTIFIER .
+
+    $default  reduce using rule 239 (template_arg)
+
+
+State 285
+
+  246 template_specifier: TEMPLATE '<' template_arg_list '>' .
+
+    $default  reduce using rule 246 (template_specifier)
+
+
+State 286
+
+  241 template_arg_list: template_arg_list ',' . template_arg
+
+    IDENTIFIER  shift, and go to state 66
+    CHAR        shift, and go to state 3
+    SHORT       shift, and go to state 4
+    INT         shift, and go to state 5
+    LONG        shift, and go to state 6
+    SIGNED      shift, and go to state 7
+    UNSIGNED    shift, and go to state 8
+    FLOAT       shift, and go to state 9
+    DOUBLE      shift, and go to state 10
+    VOID        shift, and go to state 11
+    CONST       shift, and go to state 14
+    CLASS       shift, and go to state 138
+    STRUCT      shift, and go to state 67
+
+    type_name           go to state 139
+    non_reference_type  go to state 28
+    simple_signed_type  go to state 29
+    simple_type_name    go to state 30
+    scoped_identifier   go to state 69
+    template_arg        go to state 366
+
+
+State 287
+
+   26 non_reference_type: IDENTIFIER '<' template_instance_arg_list . '>'
+   28                   | IDENTIFIER '<' template_instance_arg_list . '>' pointer
+  245 template_instance_arg_list: template_instance_arg_list . ',' template_instance_arg
+
+    '>'  shift, and go to state 367
+    ','  shift, and go to state 277
+
+
+State 288
+
+  109 overloaded_op_specifier: OPERATOR type_name '(' ')' .
+
+    $default  reduce using rule 109 (overloaded_op_specifier)
+
+
+State 289
+
+   25 non_reference_type: scoped_identifier '<' template_instance_arg_list . '>'
+   27                   | scoped_identifier '<' template_instance_arg_list . '>' pointer
+  245 template_instance_arg_list: template_instance_arg_list . ',' template_instance_arg
+
+    '>'  shift, and go to state 368
+    ','  shift, and go to state 277
+
+
+State 290
+
+  214 superclass: access_specifier_opt . type_name
+
+    IDENTIFIER  shift, and go to state 66
+    CHAR        shift, and go to state 3
+    SHORT       shift, and go to state 4
+    INT         shift, and go to state 5
+    LONG        shift, and go to state 6
+    SIGNED      shift, and go to state 7
+    UNSIGNED    shift, and go to state 8
+    FLOAT       shift, and go to state 9
+    DOUBLE      shift, and go to state 10
+    VOID        shift, and go to state 11
+    CONST       shift, and go to state 14
+    STRUCT      shift, and go to state 67
+
+    type_name           go to state 369
+    non_reference_type  go to state 28
+    simple_signed_type  go to state 29
+    simple_type_name    go to state 30
+    scoped_identifier   go to state 69
+
+
+State 291
+
+  135 access_specifier_opt: access_specifier .
+
+    $default  reduce using rule 135 (access_specifier_opt)
+
+
+State 292
+
+  204 class_specifier: CLASS IDENTIFIER ':' superclass_list . '{' member_list_opt '}'
+  213 superclass_list: superclass_list . ',' superclass
+
+    ','  shift, and go to state 370
+    '{'  shift, and go to state 371
+
+
+State 293
+
+  212 superclass_list: superclass .
+
+    $default  reduce using rule 212 (superclass_list)
+
+
+State 294
+
+  203 class_specifier: CLASS IDENTIFIER '{' member_list_opt . '}'
+
+    '}'  shift, and go to state 372
+
+
+State 295
+
+  209 class_specifier: STRUCT IDENTIFIER ':' superclass_list . '{' member_list_opt '}'
+  213 superclass_list: superclass_list . ',' superclass
+
+    ','  shift, and go to state 370
+    '{'  shift, and go to state 373
+
+
+State 296
+
+  208 class_specifier: STRUCT IDENTIFIER '{' member_list_opt . '}'
+
+    '}'  shift, and go to state 374
+
+
+State 297
+
+   18 forward_decl: CLASS . IDENTIFIER
+   19             | CLASS . scoped_identifier
+
+    IDENTIFIER  shift, and go to state 375
+
+    scoped_identifier  go to state 72
+
+
+State 298
+
+   20 forward_decl: STRUCT . IDENTIFIER
+   21             | STRUCT . scoped_identifier
+   24 non_reference_type: STRUCT . IDENTIFIER
+   31                   | STRUCT . IDENTIFIER pointer
+
+    IDENTIFIER  shift, and go to state 376
+
+    scoped_identifier  go to state 75
+
+
+State 299
+
+  102 function_specifier: type_name . IDENTIFIER '(' parameter_list_opt ')'
+  108 overloaded_op_specifier: type_name . OPERATOR any_operator '(' parameter_list_opt ')'
+
+    IDENTIFIER  shift, and go to state 377
+    OPERATOR    shift, and go to state 92
+
+
+State 300
+
+  216 friend_specifier: FRIEND forward_decl .
+
+    $default  reduce using rule 216 (friend_specifier)
+
+
+State 301
+
+  215 friend_specifier: FRIEND member_func_specifier .
+
+    $default  reduce using rule 215 (friend_specifier)
+
+
+State 302
+
+  203 class_specifier: CLASS IDENTIFIER . '{' member_list_opt '}'
+  204                | CLASS IDENTIFIER . ':' superclass_list '{' member_list_opt '}'
+
+    ':'  shift, and go to state 149
+    '{'  shift, and go to state 150
+
+
+State 303
+
+   24 non_reference_type: STRUCT IDENTIFIER .
+   31                   | STRUCT IDENTIFIER . pointer
+  208 class_specifier: STRUCT IDENTIFIER . '{' member_list_opt '}'
+  209                | STRUCT IDENTIFIER . ':' superclass_list '{' member_list_opt '}'
+
+    '*'  shift, and go to state 55
+    ':'  shift, and go to state 151
+    '{'  shift, and go to state 152
+
+    $default  reduce using rule 24 (non_reference_type)
+
+    pointer   go to state 153
+    asterisk  go to state 58
+
+
+State 304
+
+  137 access_specifier_list: access_specifier_list access_specifier . ':'
+
+    ':'  shift, and go to state 378
+
+
+State 305
+
+  224 member_with_access: access_specifier_list member_or_error .
+
+    $default  reduce using rule 224 (member_with_access)
+
+
+State 306
+
+  136 access_specifier_list: access_specifier ':' .
+
+    $default  reduce using rule 136 (access_specifier_list)
+
+
+State 307
+
+  226 member: friend_specifier ';' .
+
+    $default  reduce using rule 226 (member)
+
+
+State 308
+
+  207 class_specifier: STRUCT '{' member_list_opt '}' .
+
+    $default  reduce using rule 207 (class_specifier)
+
+
+State 309
+
+  220 member_list: member_list member_with_access .
+
+    $default  reduce using rule 220 (member_list)
+
+
+State 310
+
+  225 member: member_specifier ';' .
+
+    $default  reduce using rule 225 (member)
+
+
+State 311
+
+  210 class_specifier: template_specifier STRUCT . IDENTIFIER '{' member_list_opt '}'
+  211                | template_specifier STRUCT . IDENTIFIER ':' superclass_list '{' member_list_opt '}'
+
+    IDENTIFIER  shift, and go to state 379
+
+
+State 312
+
+   71 variable_specifier_list: variable_specifier_list . multiple_variable_specifier ';'
+  200 union_specifier: UNION IDENTIFIER '{' variable_specifier_list . '}'
+
+    IDENTIFIER  shift, and go to state 66
+    CHAR        shift, and go to state 3
+    SHORT       shift, and go to state 4
+    INT         shift, and go to state 5
+    LONG        shift, and go to state 6
+    SIGNED      shift, and go to state 7
+    UNSIGNED    shift, and go to state 8
+    FLOAT       shift, and go to state 9
+    DOUBLE      shift, and go to state 10
+    VOID        shift, and go to state 11
+    CONST       shift, and go to state 14
+    STRUCT      shift, and go to state 67
+    EXTERN      shift, and go to state 129
+    '}'         shift, and go to state 380
+
+    type_name                    go to state 175
+    non_reference_type           go to state 28
+    simple_signed_type           go to state 29
+    simple_type_name             go to state 30
+    scoped_identifier            go to state 69
+    variable_or_parameter        go to state 32
+    variable_specifier           go to state 33
+    multiple_variable_specifier  go to state 315
+
+
+State 313
+
+   70 variable_specifier_list: multiple_variable_specifier ';' .
+
+    $default  reduce using rule 70 (variable_specifier_list)
+
+
+State 314
+
+  201 union_specifier: UNION '{' variable_specifier_list '}' .
+
+    $default  reduce using rule 201 (union_specifier)
+
+
+State 315
+
+   69 multiple_variable_specifier: multiple_variable_specifier . ',' variable_name
+   71 variable_specifier_list: variable_specifier_list multiple_variable_specifier . ';'
+
+    ';'  shift, and go to state 381
+    ','  shift, and go to state 104
+
+
+State 316
+
+  128 enum_specifier: ENUM IDENTIFIER '{' enumerator_list . '}'
+  131 enumerator_list: enumerator_list . ',' enumerator
+
+    ','  shift, and go to state 318
+    '}'  shift, and go to state 382
+
+
+State 317
+
+  133 enumerator: IDENTIFIER '=' . constant_value
+
+    IDENTIFIER      shift, and go to state 241
+    CONSTANT        shift, and go to state 242
+    STRING_LITERAL  shift, and go to state 243
+    '('             shift, and go to state 245
+    '{'             shift, and go to state 105
+    '-'             shift, and go to state 246
+
+    scoped_identifier          go to state 247
+    compound_statement         go to state 248
+    constant_value             go to state 383
+    expression                 go to state 250
+    primary_expression         go to state 251
+    multiplicative_expression  go to state 252
+    additive_expression        go to state 253
+
+
+State 318
+
+  131 enumerator_list: enumerator_list ',' . enumerator
+
+    IDENTIFIER  shift, and go to state 179
+
+    enumerator  go to state 384
+
+
+State 319
+
+  127 enum_specifier: ENUM '{' enumerator_list '}' .
+
+    $default  reduce using rule 127 (enum_specifier)
+
+
+State 320
+
+  116 destructor: '~' IDENTIFIER '(' ')' .
+
+    $default  reduce using rule 116 (destructor)
+
+
+State 321
+
+  106 overloaded_op_skeleton: type_name IDENTIFIER CLCL OPERATOR . any_operator '(' parameter_list_opt ')'
+
+    NEW           shift, and go to state 190
+    DELETE        shift, and go to state 191
+    PTR_OP        shift, and go to state 192
+    INC_OP        shift, and go to state 193
+    DEC_OP        shift, and go to state 194
+    LEFT_OP       shift, and go to state 195
+    RIGHT_OP      shift, and go to state 196
+    LE_OP         shift, and go to state 197
+    GE_OP         shift, and go to state 198
+    EQ_OP         shift, and go to state 199
+    NE_OP         shift, and go to state 200
+    AND_OP        shift, and go to state 201
+    OR_OP         shift, and go to state 202
+    MUL_ASSIGN    shift, and go to state 203
+    DIV_ASSIGN    shift, and go to state 204
+    MOD_ASSIGN    shift, and go to state 205
+    ADD_ASSIGN    shift, and go to state 206
+    SUB_ASSIGN    shift, and go to state 207
+    LEFT_ASSIGN   shift, and go to state 208
+    RIGHT_ASSIGN  shift, and go to state 209
+    AND_ASSIGN    shift, and go to state 210
+    XOR_ASSIGN    shift, and go to state 211
+    OR_ASSIGN     shift, and go to state 212
+    MEM_PTR_OP    shift, and go to state 213
+    '&'           shift, and go to state 214
+    '<'           shift, and go to state 215
+    '>'           shift, and go to state 216
+    '*'           shift, and go to state 217
+    '['           shift, and go to state 218
+    '='           shift, and go to state 219
+    ','           shift, and go to state 220
+    '('           shift, and go to state 221
+    '~'           shift, and go to state 222
+    '+'           shift, and go to state 223
+    '-'           shift, and go to state 224
+    '!'           shift, and go to state 225
+    '/'           shift, and go to state 226
+    '%'           shift, and go to state 227
+    '^'           shift, and go to state 228
+    '|'           shift, and go to state 229
+
+    unary_operator       go to state 230
+    binary_operator      go to state 231
+    assignment_operator  go to state 232
+    any_operator         go to state 385
+
+
+State 322
+
+  100 member_func_skel_spec: type_name IDENTIFIER '<' template_instance_arg_list . '>' CLCL IDENTIFIER '(' parameter_list_opt ')'
+  245 template_instance_arg_list: template_instance_arg_list . ',' template_instance_arg
+
+    '>'  shift, and go to state 386
+    ','  shift, and go to state 277
+
+
+State 323
+
+   60 bitfield_savvy_identifier: IDENTIFIER ':' CONSTANT .
+
+    $default  reduce using rule 60 (bitfield_savvy_identifier)
+
+
+State 324
+
+  102 function_specifier: type_name IDENTIFIER '(' parameter_list_opt . ')'
+
+    ')'  shift, and go to state 387
+
+
+State 325
+
+  182 any_operator: '[' ']' .
+
+    $default  reduce using rule 182 (any_operator)
+
+
+State 326
+
+  183 any_operator: '(' ')' .
+
+    $default  reduce using rule 183 (any_operator)
+
+
+State 327
+
+  108 overloaded_op_specifier: type_name OPERATOR any_operator '(' . parameter_list_opt ')'
+
+    IDENTIFIER  shift, and go to state 66
+    CHAR        shift, and go to state 3
+    SHORT       shift, and go to state 4
+    INT         shift, and go to state 5
+    LONG        shift, and go to state 6
+    SIGNED      shift, and go to state 7
+    UNSIGNED    shift, and go to state 8
+    FLOAT       shift, and go to state 9
+    DOUBLE      shift, and go to state 10
+    VOID        shift, and go to state 11
+    CONST       shift, and go to state 14
+    STRUCT      shift, and go to state 67
+    EXTERN      shift, and go to state 129
+    ELIPSIS     shift, and go to state 130
+
+    $default  reduce using rule 72 (parameter_list_opt)
+
+    type_name              go to state 131
+    non_reference_type     go to state 28
+    simple_signed_type     go to state 29
+    simple_type_name       go to state 30
+    scoped_identifier      go to state 69
+    variable_or_parameter  go to state 32
+    variable_specifier     go to state 132
+    parameter_list_opt     go to state 388
+    parameter_list         go to state 134
+    unnamed_parameter      go to state 135
+
+
+State 328
+
+  104 overloaded_op_skeleton: type_name scoped_identifier CLCL OPERATOR . any_operator '(' parameter_list_opt ')'
+
+    NEW           shift, and go to state 190
+    DELETE        shift, and go to state 191
+    PTR_OP        shift, and go to state 192
+    INC_OP        shift, and go to state 193
+    DEC_OP        shift, and go to state 194
+    LEFT_OP       shift, and go to state 195
+    RIGHT_OP      shift, and go to state 196
+    LE_OP         shift, and go to state 197
+    GE_OP         shift, and go to state 198
+    EQ_OP         shift, and go to state 199
+    NE_OP         shift, and go to state 200
+    AND_OP        shift, and go to state 201
+    OR_OP         shift, and go to state 202
+    MUL_ASSIGN    shift, and go to state 203
+    DIV_ASSIGN    shift, and go to state 204
+    MOD_ASSIGN    shift, and go to state 205
+    ADD_ASSIGN    shift, and go to state 206
+    SUB_ASSIGN    shift, and go to state 207
+    LEFT_ASSIGN   shift, and go to state 208
+    RIGHT_ASSIGN  shift, and go to state 209
+    AND_ASSIGN    shift, and go to state 210
+    XOR_ASSIGN    shift, and go to state 211
+    OR_ASSIGN     shift, and go to state 212
+    MEM_PTR_OP    shift, and go to state 213
+    '&'           shift, and go to state 214
+    '<'           shift, and go to state 215
+    '>'           shift, and go to state 216
+    '*'           shift, and go to state 217
+    '['           shift, and go to state 218
+    '='           shift, and go to state 219
+    ','           shift, and go to state 220
+    '('           shift, and go to state 221
+    '~'           shift, and go to state 222
+    '+'           shift, and go to state 223
+    '-'           shift, and go to state 224
+    '!'           shift, and go to state 225
+    '/'           shift, and go to state 226
+    '%'           shift, and go to state 227
+    '^'           shift, and go to state 228
+    '|'           shift, and go to state 229
+
+    unary_operator       go to state 230
+    binary_operator      go to state 231
+    assignment_operator  go to state 232
+    any_operator         go to state 389
+
+
+State 329
+
+   99 member_func_skel_spec: type_name scoped_identifier '(' parameter_list_opt . ')'
+
+    ')'  shift, and go to state 390
+
+
+State 330
+
+  105 overloaded_op_skeleton: scoped_identifier CLCL OPERATOR type_name . '(' ')'
+
+    '('  shift, and go to state 391
+
+
+State 331
+
+  117 destructor_skeleton: scoped_identifier CLCL '~' IDENTIFIER . '(' ')'
+
+    '('  shift, and go to state 392
+
+
+State 332
+
+   25 non_reference_type: scoped_identifier '<' template_instance_arg_list '>' .
+   27                   | scoped_identifier '<' template_instance_arg_list '>' . pointer
+  120 destructor_skeleton: scoped_identifier '<' template_instance_arg_list '>' . CLCL '~' IDENTIFIER '(' ')'
+  124 constructor_skeleton: scoped_identifier '<' template_instance_arg_list '>' . CLCL IDENTIFIER '(' parameter_list_opt ')' throw_decl
+
+    CLCL  shift, and go to state 393
+    '*'   shift, and go to state 55
+
+    $default  reduce using rule 25 (non_reference_type)
+
+    pointer   go to state 394
+    asterisk  go to state 58
+
+
+State 333
+
+  122 constructor_skeleton: scoped_identifier '(' parameter_list_opt ')' . throw_decl
+
+    THROW  shift, and go to state 261
+
+    $default  reduce using rule 112 (throw_decl)
+
+    throw_decl  go to state 395
+
+
+State 334
+
+  192 primary_expression: '(' expression . ')'
+
+    ')'  shift, and go to state 396
+
+
+State 335
+
+  188 primary_expression: '-' CONSTANT .
+
+    $default  reduce using rule 188 (primary_expression)
+
+
+State 336
+
+   57 variable_or_parameter: variable_or_parameter '[' constant_value ']' .
+
+    $default  reduce using rule 57 (variable_or_parameter)
+
+
+State 337
+
+  194 multiplicative_expression: multiplicative_expression '*' . primary_expression
+
+    IDENTIFIER      shift, and go to state 241
+    CONSTANT        shift, and go to state 242
+    STRING_LITERAL  shift, and go to state 243
+    '('             shift, and go to state 245
+    '-'             shift, and go to state 246
+
+    scoped_identifier   go to state 247
+    primary_expression  go to state 397
+
+
+State 338
+
+  195 multiplicative_expression: multiplicative_expression '/' . primary_expression
+
+    IDENTIFIER      shift, and go to state 241
+    CONSTANT        shift, and go to state 242
+    STRING_LITERAL  shift, and go to state 243
+    '('             shift, and go to state 245
+    '-'             shift, and go to state 246
+
+    scoped_identifier   go to state 247
+    primary_expression  go to state 398
+
+
+State 339
+
+  196 multiplicative_expression: multiplicative_expression '%' . primary_expression
+
+    IDENTIFIER      shift, and go to state 241
+    CONSTANT        shift, and go to state 242
+    STRING_LITERAL  shift, and go to state 243
+    '('             shift, and go to state 245
+    '-'             shift, and go to state 246
+
+    scoped_identifier   go to state 247
+    primary_expression  go to state 399
+
+
+State 340
+
+  198 additive_expression: additive_expression '+' . multiplicative_expression
+
+    IDENTIFIER      shift, and go to state 241
+    CONSTANT        shift, and go to state 242
+    STRING_LITERAL  shift, and go to state 243
+    '('             shift, and go to state 245
+    '-'             shift, and go to state 246
+
+    scoped_identifier          go to state 247
+    primary_expression         go to state 251
+    multiplicative_expression  go to state 400
+
+
+State 341
+
+  199 additive_expression: additive_expression '-' . multiplicative_expression
+
+    IDENTIFIER      shift, and go to state 241
+    CONSTANT        shift, and go to state 242
+    STRING_LITERAL  shift, and go to state 243
+    '('             shift, and go to state 245
+    '-'             shift, and go to state 246
+
+    scoped_identifier          go to state 247
+    primary_expression         go to state 251
+    multiplicative_expression  go to state 401
+
+
+State 342
+
+   62 variable_name: pointer IDENTIFIER .
+
+    $default  reduce using rule 62 (variable_name)
+
+
+State 343
+
+   63 variable_name: variable_name '[' . constant_value ']'
+   64              | variable_name '[' . ']'
+
+    IDENTIFIER      shift, and go to state 241
+    CONSTANT        shift, and go to state 242
+    STRING_LITERAL  shift, and go to state 243
+    ']'             shift, and go to state 402
+    '('             shift, and go to state 245
+    '{'             shift, and go to state 105
+    '-'             shift, and go to state 246
+
+    scoped_identifier          go to state 247
+    compound_statement         go to state 248
+    constant_value             go to state 403
+    expression                 go to state 250
+    primary_expression         go to state 251
+    multiplicative_expression  go to state 252
+    additive_expression        go to state 253
+
+
+State 344
+
+  126 compound_statement: '{' $@4 '}' .
+
+    $default  reduce using rule 126 (compound_statement)
+
+
+State 345
+
+  113 throw_decl: THROW '(' . throw_list ')'
+
+    IDENTIFIER  shift, and go to state 66
+    CHAR        shift, and go to state 3
+    SHORT       shift, and go to state 4
+    INT         shift, and go to state 5
+    LONG        shift, and go to state 6
+    SIGNED      shift, and go to state 7
+    UNSIGNED    shift, and go to state 8
+    FLOAT       shift, and go to state 9
+    DOUBLE      shift, and go to state 10
+    VOID        shift, and go to state 11
+    CONST       shift, and go to state 14
+    STRUCT      shift, and go to state 67
+
+    type_name           go to state 404
+    non_reference_type  go to state 28
+    simple_signed_type  go to state 29
+    simple_type_name    go to state 30
+    scoped_identifier   go to state 69
+    throw_list          go to state 405
+
+
+State 346
+
+   92 member_func_inlined: constructor ':' $@3 compound_statement .
+
+    $default  reduce using rule 92 (member_func_inlined)
+
+
+State 347
+
+   86 function_skeleton: constructor_skeleton ':' $@1 compound_statement .
+
+    $default  reduce using rule 86 (function_skeleton)
+
+
+State 348
+
+  237 mem_type_specifier: mem_type_specifier '[' constant_value ']' .
+
+    $default  reduce using rule 237 (mem_type_specifier)
+
+
+State 349
+
+  206 class_specifier: template_specifier CLASS IDENTIFIER ':' . superclass_list '{' member_list_opt '}'
+
+    PROTECTED  shift, and go to state 158
+    PRIVATE    shift, and go to state 159
+    PUBLIC     shift, and go to state 160
+
+    $default  reduce using rule 134 (access_specifier_opt)
+
+    access_specifier_opt  go to state 290
+    access_specifier      go to state 291
+    superclass_list       go to state 406
+    superclass            go to state 293
+
+
+State 350
+
+  205 class_specifier: template_specifier CLASS IDENTIFIER '{' . member_list_opt '}'
+
+    error       shift, and go to state 154
+    IDENTIFIER  shift, and go to state 80
+    CHAR        shift, and go to state 3
+    SHORT       shift, and go to state 4
+    INT         shift, and go to state 5
+    LONG        shift, and go to state 6
+    SIGNED      shift, and go to state 7
+    UNSIGNED    shift, and go to state 8
+    FLOAT       shift, and go to state 9
+    DOUBLE      shift, and go to state 10
+    VOID        shift, and go to state 11
+    TEMPLATE    shift, and go to state 12
+    FRIEND      shift, and go to state 155
+    OPERATOR    shift, and go to state 13
+    CONST       shift, and go to state 14
+    CLASS       shift, and go to state 156
+    STRUCT      shift, and go to state 157
+    UNION       shift, and go to state 17
+    ENUM        shift, and go to state 18
+    PROTECTED   shift, and go to state 158
+    PRIVATE     shift, and go to state 159
+    PUBLIC      shift, and go to state 160
+    EXTERN      shift, and go to state 161
+    ';'         shift, and go to state 162
+    '~'         shift, and go to state 21
+
+    '}'  reduce using rule 217 (member_list_opt)
+
+    type_specifier               go to state 25
+    type_name                    go to state 82
+    non_reference_type           go to state 28
+    simple_signed_type           go to state 29
+    simple_type_name             go to state 30
+    scoped_identifier            go to state 69
+    variable_or_parameter        go to state 32
+    variable_specifier           go to state 33
+    multiple_variable_specifier  go to state 34
+    member_func_inlined          go to state 163
+    member_func_specifier        go to state 38
+    function_specifier           go to state 40
+    overloaded_op_specifier      go to state 42
+    destructor                   go to state 43
+    constructor                  go to state 45
+    enum_specifier               go to state 47
+    access_specifier_list        go to state 164
+    access_specifier             go to state 165
+    union_specifier              go to state 48
+    class_specifier              go to state 49
+    friend_specifier             go to state 166
+    member_list_opt              go to state 407
+    member_list                  go to state 168
+    member_or_error              go to state 169
+    member_with_access           go to state 170
+    member                       go to state 171
+    member_specifier             go to state 172
+    mem_type_specifier           go to state 51
+    template_specifier           go to state 173
+
+
+State 351
+
+  211 class_specifier: template_specifier STRUCT IDENTIFIER ':' . superclass_list '{' member_list_opt '}'
+
+    PROTECTED  shift, and go to state 158
+    PRIVATE    shift, and go to state 159
+    PUBLIC     shift, and go to state 160
+
+    $default  reduce using rule 134 (access_specifier_opt)
+
+    access_specifier_opt  go to state 290
+    access_specifier      go to state 291
+    superclass_list       go to state 408
+    superclass            go to state 293
+
+
+State 352
+
+  210 class_specifier: template_specifier STRUCT IDENTIFIER '{' . member_list_opt '}'
+
+    error       shift, and go to state 154
+    IDENTIFIER  shift, and go to state 80
+    CHAR        shift, and go to state 3
+    SHORT       shift, and go to state 4
+    INT         shift, and go to state 5
+    LONG        shift, and go to state 6
+    SIGNED      shift, and go to state 7
+    UNSIGNED    shift, and go to state 8
+    FLOAT       shift, and go to state 9
+    DOUBLE      shift, and go to state 10
+    VOID        shift, and go to state 11
+    TEMPLATE    shift, and go to state 12
+    FRIEND      shift, and go to state 155
+    OPERATOR    shift, and go to state 13
+    CONST       shift, and go to state 14
+    CLASS       shift, and go to state 156
+    STRUCT      shift, and go to state 157
+    UNION       shift, and go to state 17
+    ENUM        shift, and go to state 18
+    PROTECTED   shift, and go to state 158
+    PRIVATE     shift, and go to state 159
+    PUBLIC      shift, and go to state 160
+    EXTERN      shift, and go to state 161
+    ';'         shift, and go to state 162
+    '~'         shift, and go to state 21
+
+    '}'  reduce using rule 217 (member_list_opt)
+
+    type_specifier               go to state 25
+    type_name                    go to state 82
+    non_reference_type           go to state 28
+    simple_signed_type           go to state 29
+    simple_type_name             go to state 30
+    scoped_identifier            go to state 69
+    variable_or_parameter        go to state 32
+    variable_specifier           go to state 33
+    multiple_variable_specifier  go to state 34
+    member_func_inlined          go to state 163
+    member_func_specifier        go to state 38
+    function_specifier           go to state 40
+    overloaded_op_specifier      go to state 42
+    destructor                   go to state 43
+    constructor                  go to state 45
+    enum_specifier               go to state 47
+    access_specifier_list        go to state 164
+    access_specifier             go to state 165
+    union_specifier              go to state 48
+    class_specifier              go to state 49
+    friend_specifier             go to state 166
+    member_list_opt              go to state 409
+    member_list                  go to state 168
+    member_or_error              go to state 169
+    member_with_access           go to state 170
+    member                       go to state 171
+    member_specifier             go to state 172
+    mem_type_specifier           go to state 51
+    template_specifier           go to state 173
+
+
+State 353
+
+   89 function_skeleton: template_specifier constructor_skeleton ':' $@2 . compound_statement
+
+    '{'  shift, and go to state 105
+
+    compound_statement  go to state 410
+
+
+State 354
+
+  107 overloaded_op_skeleton: IDENTIFIER CLCL OPERATOR type_name '(' . ')'
+
+    ')'  shift, and go to state 411
+
+
+State 355
+
+  118 destructor_skeleton: IDENTIFIER CLCL '~' IDENTIFIER '(' . ')'
+
+    ')'  shift, and go to state 412
+
+
+State 356
+
+  119 destructor_skeleton: IDENTIFIER '<' template_instance_arg_list '>' CLCL . '~' IDENTIFIER '(' ')'
+  123 constructor_skeleton: IDENTIFIER '<' template_instance_arg_list '>' CLCL . IDENTIFIER '(' parameter_list_opt ')' throw_decl
+
+    IDENTIFIER  shift, and go to state 413
+    '~'         shift, and go to state 414
+
+
+State 357
+
+   28 non_reference_type: IDENTIFIER '<' template_instance_arg_list '>' pointer .
+   52 pointer: pointer . asterisk
+
+    '*'  shift, and go to state 55
+
+    $default  reduce using rule 28 (non_reference_type)
+
+    asterisk  go to state 136
+
+
+State 358
+
+  245 template_instance_arg_list: template_instance_arg_list ',' template_instance_arg .
+
+    $default  reduce using rule 245 (template_instance_arg_list)
+
+
+State 359
+
+   81 unnamed_parameter: type_name '=' constant_value .
+
+    $default  reduce using rule 81 (unnamed_parameter)
+
+
+State 360
+
+  121 constructor: IDENTIFIER '(' parameter_list_opt ')' throw_decl .
+
+    $default  reduce using rule 121 (constructor)
+
+
+State 361
+
+   74 parameter_list_opt: parameter_list ',' ELIPSIS .
+
+    $default  reduce using rule 74 (parameter_list_opt)
+
+
+State 362
+
+   78 parameter_list: parameter_list ',' variable_specifier .
+
+    $default  reduce using rule 78 (parameter_list)
+
+
+State 363
+
+   79 parameter_list: parameter_list ',' unnamed_parameter .
+   82 unnamed_parameter: unnamed_parameter . '[' constant_value ']'
+   83                  | unnamed_parameter . '[' ']'
+
+    '['  shift, and go to state 282
+
+    $default  reduce using rule 79 (parameter_list)
+
+
+State 364
+
+   83 unnamed_parameter: unnamed_parameter '[' ']' .
+
+    $default  reduce using rule 83 (unnamed_parameter)
+
+
+State 365
+
+   82 unnamed_parameter: unnamed_parameter '[' constant_value . ']'
+
+    ']'  shift, and go to state 415
+
+
+State 366
+
+  241 template_arg_list: template_arg_list ',' template_arg .
+
+    $default  reduce using rule 241 (template_arg_list)
+
+
+State 367
+
+   26 non_reference_type: IDENTIFIER '<' template_instance_arg_list '>' .
+   28                   | IDENTIFIER '<' template_instance_arg_list '>' . pointer
+
+    '*'  shift, and go to state 55
+
+    $default  reduce using rule 26 (non_reference_type)
+
+    pointer   go to state 357
+    asterisk  go to state 58
+
+
+State 368
+
+   25 non_reference_type: scoped_identifier '<' template_instance_arg_list '>' .
+   27                   | scoped_identifier '<' template_instance_arg_list '>' . pointer
+
+    '*'  shift, and go to state 55
+
+    $default  reduce using rule 25 (non_reference_type)
+
+    pointer   go to state 394
+    asterisk  go to state 58
+
+
+State 369
+
+  214 superclass: access_specifier_opt type_name .
+
+    $default  reduce using rule 214 (superclass)
+
+
+State 370
+
+  213 superclass_list: superclass_list ',' . superclass
+
+    PROTECTED  shift, and go to state 158
+    PRIVATE    shift, and go to state 159
+    PUBLIC     shift, and go to state 160
+
+    $default  reduce using rule 134 (access_specifier_opt)
+
+    access_specifier_opt  go to state 290
+    access_specifier      go to state 291
+    superclass            go to state 416
+
+
+State 371
+
+  204 class_specifier: CLASS IDENTIFIER ':' superclass_list '{' . member_list_opt '}'
+
+    error       shift, and go to state 154
+    IDENTIFIER  shift, and go to state 80
+    CHAR        shift, and go to state 3
+    SHORT       shift, and go to state 4
+    INT         shift, and go to state 5
+    LONG        shift, and go to state 6
+    SIGNED      shift, and go to state 7
+    UNSIGNED    shift, and go to state 8
+    FLOAT       shift, and go to state 9
+    DOUBLE      shift, and go to state 10
+    VOID        shift, and go to state 11
+    TEMPLATE    shift, and go to state 12
+    FRIEND      shift, and go to state 155
+    OPERATOR    shift, and go to state 13
+    CONST       shift, and go to state 14
+    CLASS       shift, and go to state 156
+    STRUCT      shift, and go to state 157
+    UNION       shift, and go to state 17
+    ENUM        shift, and go to state 18
+    PROTECTED   shift, and go to state 158
+    PRIVATE     shift, and go to state 159
+    PUBLIC      shift, and go to state 160
+    EXTERN      shift, and go to state 161
+    ';'         shift, and go to state 162
+    '~'         shift, and go to state 21
+
+    '}'  reduce using rule 217 (member_list_opt)
+
+    type_specifier               go to state 25
+    type_name                    go to state 82
+    non_reference_type           go to state 28
+    simple_signed_type           go to state 29
+    simple_type_name             go to state 30
+    scoped_identifier            go to state 69
+    variable_or_parameter        go to state 32
+    variable_specifier           go to state 33
+    multiple_variable_specifier  go to state 34
+    member_func_inlined          go to state 163
+    member_func_specifier        go to state 38
+    function_specifier           go to state 40
+    overloaded_op_specifier      go to state 42
+    destructor                   go to state 43
+    constructor                  go to state 45
+    enum_specifier               go to state 47
+    access_specifier_list        go to state 164
+    access_specifier             go to state 165
+    union_specifier              go to state 48
+    class_specifier              go to state 49
+    friend_specifier             go to state 166
+    member_list_opt              go to state 417
+    member_list                  go to state 168
+    member_or_error              go to state 169
+    member_with_access           go to state 170
+    member                       go to state 171
+    member_specifier             go to state 172
+    mem_type_specifier           go to state 51
+    template_specifier           go to state 173
+
+
+State 372
+
+  203 class_specifier: CLASS IDENTIFIER '{' member_list_opt '}' .
+
+    $default  reduce using rule 203 (class_specifier)
+
+
+State 373
+
+  209 class_specifier: STRUCT IDENTIFIER ':' superclass_list '{' . member_list_opt '}'
+
+    error       shift, and go to state 154
+    IDENTIFIER  shift, and go to state 80
+    CHAR        shift, and go to state 3
+    SHORT       shift, and go to state 4
+    INT         shift, and go to state 5
+    LONG        shift, and go to state 6
+    SIGNED      shift, and go to state 7
+    UNSIGNED    shift, and go to state 8
+    FLOAT       shift, and go to state 9
+    DOUBLE      shift, and go to state 10
+    VOID        shift, and go to state 11
+    TEMPLATE    shift, and go to state 12
+    FRIEND      shift, and go to state 155
+    OPERATOR    shift, and go to state 13
+    CONST       shift, and go to state 14
+    CLASS       shift, and go to state 156
+    STRUCT      shift, and go to state 157
+    UNION       shift, and go to state 17
+    ENUM        shift, and go to state 18
+    PROTECTED   shift, and go to state 158
+    PRIVATE     shift, and go to state 159
+    PUBLIC      shift, and go to state 160
+    EXTERN      shift, and go to state 161
+    ';'         shift, and go to state 162
+    '~'         shift, and go to state 21
+
+    '}'  reduce using rule 217 (member_list_opt)
+
+    type_specifier               go to state 25
+    type_name                    go to state 82
+    non_reference_type           go to state 28
+    simple_signed_type           go to state 29
+    simple_type_name             go to state 30
+    scoped_identifier            go to state 69
+    variable_or_parameter        go to state 32
+    variable_specifier           go to state 33
+    multiple_variable_specifier  go to state 34
+    member_func_inlined          go to state 163
+    member_func_specifier        go to state 38
+    function_specifier           go to state 40
+    overloaded_op_specifier      go to state 42
+    destructor                   go to state 43
+    constructor                  go to state 45
+    enum_specifier               go to state 47
+    access_specifier_list        go to state 164
+    access_specifier             go to state 165
+    union_specifier              go to state 48
+    class_specifier              go to state 49
+    friend_specifier             go to state 166
+    member_list_opt              go to state 418
+    member_list                  go to state 168
+    member_or_error              go to state 169
+    member_with_access           go to state 170
+    member                       go to state 171
+    member_specifier             go to state 172
+    mem_type_specifier           go to state 51
+    template_specifier           go to state 173
+
+
+State 374
+
+  208 class_specifier: STRUCT IDENTIFIER '{' member_list_opt '}' .
+
+    $default  reduce using rule 208 (class_specifier)
+
+
+State 375
+
+   18 forward_decl: CLASS IDENTIFIER .
+   49 scoped_identifier: IDENTIFIER . CLCL IDENTIFIER
+
+    CLCL  shift, and go to state 142
+
+    $default  reduce using rule 18 (forward_decl)
+
+
+State 376
+
+   20 forward_decl: STRUCT IDENTIFIER .
+   24 non_reference_type: STRUCT IDENTIFIER .
+   31                   | STRUCT IDENTIFIER . pointer
+   49 scoped_identifier: IDENTIFIER . CLCL IDENTIFIER
+
+    CLCL  shift, and go to state 142
+    '*'   shift, and go to state 55
+
+    ';'       reduce using rule 20 (forward_decl)
+    $default  reduce using rule 24 (non_reference_type)
+
+    pointer   go to state 153
+    asterisk  go to state 58
+
+
+State 377
+
+  102 function_specifier: type_name IDENTIFIER . '(' parameter_list_opt ')'
+
+    '('  shift, and go to state 189
+
+
+State 378
+
+  137 access_specifier_list: access_specifier_list access_specifier ':' .
+
+    $default  reduce using rule 137 (access_specifier_list)
+
+
+State 379
+
+  210 class_specifier: template_specifier STRUCT IDENTIFIER . '{' member_list_opt '}'
+  211                | template_specifier STRUCT IDENTIFIER . ':' superclass_list '{' member_list_opt '}'
+
+    ':'  shift, and go to state 351
+    '{'  shift, and go to state 352
+
+
+State 380
+
+  200 union_specifier: UNION IDENTIFIER '{' variable_specifier_list '}' .
+
+    $default  reduce using rule 200 (union_specifier)
+
+
+State 381
+
+   71 variable_specifier_list: variable_specifier_list multiple_variable_specifier ';' .
+
+    $default  reduce using rule 71 (variable_specifier_list)
+
+
+State 382
+
+  128 enum_specifier: ENUM IDENTIFIER '{' enumerator_list '}' .
+
+    $default  reduce using rule 128 (enum_specifier)
+
+
+State 383
+
+  133 enumerator: IDENTIFIER '=' constant_value .
+
+    $default  reduce using rule 133 (enumerator)
+
+
+State 384
+
+  131 enumerator_list: enumerator_list ',' enumerator .
+
+    $default  reduce using rule 131 (enumerator_list)
+
+
+State 385
+
+  106 overloaded_op_skeleton: type_name IDENTIFIER CLCL OPERATOR any_operator . '(' parameter_list_opt ')'
+
+    '('  shift, and go to state 419
+
+
+State 386
+
+  100 member_func_skel_spec: type_name IDENTIFIER '<' template_instance_arg_list '>' . CLCL IDENTIFIER '(' parameter_list_opt ')'
+
+    CLCL  shift, and go to state 420
+
+
+State 387
+
+  102 function_specifier: type_name IDENTIFIER '(' parameter_list_opt ')' .
+
+    $default  reduce using rule 102 (function_specifier)
+
+
+State 388
+
+  108 overloaded_op_specifier: type_name OPERATOR any_operator '(' parameter_list_opt . ')'
+
+    ')'  shift, and go to state 421
+
+
+State 389
+
+  104 overloaded_op_skeleton: type_name scoped_identifier CLCL OPERATOR any_operator . '(' parameter_list_opt ')'
+
+    '('  shift, and go to state 422
+
+
+State 390
+
+   99 member_func_skel_spec: type_name scoped_identifier '(' parameter_list_opt ')' .
+
+    $default  reduce using rule 99 (member_func_skel_spec)
+
+
+State 391
+
+  105 overloaded_op_skeleton: scoped_identifier CLCL OPERATOR type_name '(' . ')'
+
+    ')'  shift, and go to state 423
+
+
+State 392
+
+  117 destructor_skeleton: scoped_identifier CLCL '~' IDENTIFIER '(' . ')'
+
+    ')'  shift, and go to state 424
+
+
+State 393
+
+  120 destructor_skeleton: scoped_identifier '<' template_instance_arg_list '>' CLCL . '~' IDENTIFIER '(' ')'
+  124 constructor_skeleton: scoped_identifier '<' template_instance_arg_list '>' CLCL . IDENTIFIER '(' parameter_list_opt ')' throw_decl
+
+    IDENTIFIER  shift, and go to state 425
+    '~'         shift, and go to state 426
+
+
+State 394
+
+   27 non_reference_type: scoped_identifier '<' template_instance_arg_list '>' pointer .
+   52 pointer: pointer . asterisk
+
+    '*'  shift, and go to state 55
+
+    $default  reduce using rule 27 (non_reference_type)
+
+    asterisk  go to state 136
+
+
+State 395
+
+  122 constructor_skeleton: scoped_identifier '(' parameter_list_opt ')' throw_decl .
+
+    $default  reduce using rule 122 (constructor_skeleton)
+
+
+State 396
+
+  192 primary_expression: '(' expression ')' .
+
+    $default  reduce using rule 192 (primary_expression)
+
+
+State 397
+
+  194 multiplicative_expression: multiplicative_expression '*' primary_expression .
+
+    $default  reduce using rule 194 (multiplicative_expression)
+
+
+State 398
+
+  195 multiplicative_expression: multiplicative_expression '/' primary_expression .
+
+    $default  reduce using rule 195 (multiplicative_expression)
+
+
+State 399
+
+  196 multiplicative_expression: multiplicative_expression '%' primary_expression .
+
+    $default  reduce using rule 196 (multiplicative_expression)
+
+
+State 400
+
+  194 multiplicative_expression: multiplicative_expression . '*' primary_expression
+  195                          | multiplicative_expression . '/' primary_expression
+  196                          | multiplicative_expression . '%' primary_expression
+  198 additive_expression: additive_expression '+' multiplicative_expression .
+
+    '*'  shift, and go to state 337
+    '/'  shift, and go to state 338
+    '%'  shift, and go to state 339
+
+    $default  reduce using rule 198 (additive_expression)
+
+
+State 401
+
+  194 multiplicative_expression: multiplicative_expression . '*' primary_expression
+  195                          | multiplicative_expression . '/' primary_expression
+  196                          | multiplicative_expression . '%' primary_expression
+  199 additive_expression: additive_expression '-' multiplicative_expression .
+
+    '*'  shift, and go to state 337
+    '/'  shift, and go to state 338
+    '%'  shift, and go to state 339
+
+    $default  reduce using rule 199 (additive_expression)
+
+
+State 402
+
+   64 variable_name: variable_name '[' ']' .
+
+    $default  reduce using rule 64 (variable_name)
+
+
+State 403
+
+   63 variable_name: variable_name '[' constant_value . ']'
+
+    ']'  shift, and go to state 427
+
+
+State 404
+
+  114 throw_list: type_name .
+
+    $default  reduce using rule 114 (throw_list)
+
+
+State 405
+
+  113 throw_decl: THROW '(' throw_list . ')'
+  115 throw_list: throw_list . ',' type_name
+
+    ','  shift, and go to state 428
+    ')'  shift, and go to state 429
+
+
+State 406
+
+  206 class_specifier: template_specifier CLASS IDENTIFIER ':' superclass_list . '{' member_list_opt '}'
+  213 superclass_list: superclass_list . ',' superclass
+
+    ','  shift, and go to state 370
+    '{'  shift, and go to state 430
+
+
+State 407
+
+  205 class_specifier: template_specifier CLASS IDENTIFIER '{' member_list_opt . '}'
+
+    '}'  shift, and go to state 431
+
+
+State 408
+
+  211 class_specifier: template_specifier STRUCT IDENTIFIER ':' superclass_list . '{' member_list_opt '}'
+  213 superclass_list: superclass_list . ',' superclass
+
+    ','  shift, and go to state 370
+    '{'  shift, and go to state 432
+
+
+State 409
+
+  210 class_specifier: template_specifier STRUCT IDENTIFIER '{' member_list_opt . '}'
+
+    '}'  shift, and go to state 433
+
+
+State 410
+
+   89 function_skeleton: template_specifier constructor_skeleton ':' $@2 compound_statement .
+
+    $default  reduce using rule 89 (function_skeleton)
+
+
+State 411
+
+  107 overloaded_op_skeleton: IDENTIFIER CLCL OPERATOR type_name '(' ')' .
+
+    $default  reduce using rule 107 (overloaded_op_skeleton)
+
+
+State 412
+
+  118 destructor_skeleton: IDENTIFIER CLCL '~' IDENTIFIER '(' ')' .
+
+    $default  reduce using rule 118 (destructor_skeleton)
+
+
+State 413
+
+  123 constructor_skeleton: IDENTIFIER '<' template_instance_arg_list '>' CLCL IDENTIFIER . '(' parameter_list_opt ')' throw_decl
+
+    '('  shift, and go to state 434
+
+
+State 414
+
+  119 destructor_skeleton: IDENTIFIER '<' template_instance_arg_list '>' CLCL '~' . IDENTIFIER '(' ')'
+
+    IDENTIFIER  shift, and go to state 435
+
+
+State 415
+
+   82 unnamed_parameter: unnamed_parameter '[' constant_value ']' .
+
+    $default  reduce using rule 82 (unnamed_parameter)
+
+
+State 416
+
+  213 superclass_list: superclass_list ',' superclass .
+
+    $default  reduce using rule 213 (superclass_list)
+
+
+State 417
+
+  204 class_specifier: CLASS IDENTIFIER ':' superclass_list '{' member_list_opt . '}'
+
+    '}'  shift, and go to state 436
+
+
+State 418
+
+  209 class_specifier: STRUCT IDENTIFIER ':' superclass_list '{' member_list_opt . '}'
+
+    '}'  shift, and go to state 437
+
+
+State 419
+
+  106 overloaded_op_skeleton: type_name IDENTIFIER CLCL OPERATOR any_operator '(' . parameter_list_opt ')'
+
+    IDENTIFIER  shift, and go to state 66
+    CHAR        shift, and go to state 3
+    SHORT       shift, and go to state 4
+    INT         shift, and go to state 5
+    LONG        shift, and go to state 6
+    SIGNED      shift, and go to state 7
+    UNSIGNED    shift, and go to state 8
+    FLOAT       shift, and go to state 9
+    DOUBLE      shift, and go to state 10
+    VOID        shift, and go to state 11
+    CONST       shift, and go to state 14
+    STRUCT      shift, and go to state 67
+    EXTERN      shift, and go to state 129
+    ELIPSIS     shift, and go to state 130
+
+    $default  reduce using rule 72 (parameter_list_opt)
+
+    type_name              go to state 131
+    non_reference_type     go to state 28
+    simple_signed_type     go to state 29
+    simple_type_name       go to state 30
+    scoped_identifier      go to state 69
+    variable_or_parameter  go to state 32
+    variable_specifier     go to state 132
+    parameter_list_opt     go to state 438
+    parameter_list         go to state 134
+    unnamed_parameter      go to state 135
+
+
+State 420
+
+  100 member_func_skel_spec: type_name IDENTIFIER '<' template_instance_arg_list '>' CLCL . IDENTIFIER '(' parameter_list_opt ')'
+
+    IDENTIFIER  shift, and go to state 439
+
+
+State 421
+
+  108 overloaded_op_specifier: type_name OPERATOR any_operator '(' parameter_list_opt ')' .
+
+    $default  reduce using rule 108 (overloaded_op_specifier)
+
+
+State 422
+
+  104 overloaded_op_skeleton: type_name scoped_identifier CLCL OPERATOR any_operator '(' . parameter_list_opt ')'
+
+    IDENTIFIER  shift, and go to state 66
+    CHAR        shift, and go to state 3
+    SHORT       shift, and go to state 4
+    INT         shift, and go to state 5
+    LONG        shift, and go to state 6
+    SIGNED      shift, and go to state 7
+    UNSIGNED    shift, and go to state 8
+    FLOAT       shift, and go to state 9
+    DOUBLE      shift, and go to state 10
+    VOID        shift, and go to state 11
+    CONST       shift, and go to state 14
+    STRUCT      shift, and go to state 67
+    EXTERN      shift, and go to state 129
+    ELIPSIS     shift, and go to state 130
+
+    $default  reduce using rule 72 (parameter_list_opt)
+
+    type_name              go to state 131
+    non_reference_type     go to state 28
+    simple_signed_type     go to state 29
+    simple_type_name       go to state 30
+    scoped_identifier      go to state 69
+    variable_or_parameter  go to state 32
+    variable_specifier     go to state 132
+    parameter_list_opt     go to state 440
+    parameter_list         go to state 134
+    unnamed_parameter      go to state 135
+
+
+State 423
+
+  105 overloaded_op_skeleton: scoped_identifier CLCL OPERATOR type_name '(' ')' .
+
+    $default  reduce using rule 105 (overloaded_op_skeleton)
+
+
+State 424
+
+  117 destructor_skeleton: scoped_identifier CLCL '~' IDENTIFIER '(' ')' .
+
+    $default  reduce using rule 117 (destructor_skeleton)
+
+
+State 425
+
+  124 constructor_skeleton: scoped_identifier '<' template_instance_arg_list '>' CLCL IDENTIFIER . '(' parameter_list_opt ')' throw_decl
+
+    '('  shift, and go to state 441
+
+
+State 426
+
+  120 destructor_skeleton: scoped_identifier '<' template_instance_arg_list '>' CLCL '~' . IDENTIFIER '(' ')'
+
+    IDENTIFIER  shift, and go to state 442
+
+
+State 427
+
+   63 variable_name: variable_name '[' constant_value ']' .
+
+    $default  reduce using rule 63 (variable_name)
+
+
+State 428
+
+  115 throw_list: throw_list ',' . type_name
+
+    IDENTIFIER  shift, and go to state 66
+    CHAR        shift, and go to state 3
+    SHORT       shift, and go to state 4
+    INT         shift, and go to state 5
+    LONG        shift, and go to state 6
+    SIGNED      shift, and go to state 7
+    UNSIGNED    shift, and go to state 8
+    FLOAT       shift, and go to state 9
+    DOUBLE      shift, and go to state 10
+    VOID        shift, and go to state 11
+    CONST       shift, and go to state 14
+    STRUCT      shift, and go to state 67
+
+    type_name           go to state 443
+    non_reference_type  go to state 28
+    simple_signed_type  go to state 29
+    simple_type_name    go to state 30
+    scoped_identifier   go to state 69
+
+
+State 429
+
+  113 throw_decl: THROW '(' throw_list ')' .
+
+    $default  reduce using rule 113 (throw_decl)
+
+
+State 430
+
+  206 class_specifier: template_specifier CLASS IDENTIFIER ':' superclass_list '{' . member_list_opt '}'
+
+    error       shift, and go to state 154
+    IDENTIFIER  shift, and go to state 80
+    CHAR        shift, and go to state 3
+    SHORT       shift, and go to state 4
+    INT         shift, and go to state 5
+    LONG        shift, and go to state 6
+    SIGNED      shift, and go to state 7
+    UNSIGNED    shift, and go to state 8
+    FLOAT       shift, and go to state 9
+    DOUBLE      shift, and go to state 10
+    VOID        shift, and go to state 11
+    TEMPLATE    shift, and go to state 12
+    FRIEND      shift, and go to state 155
+    OPERATOR    shift, and go to state 13
+    CONST       shift, and go to state 14
+    CLASS       shift, and go to state 156
+    STRUCT      shift, and go to state 157
+    UNION       shift, and go to state 17
+    ENUM        shift, and go to state 18
+    PROTECTED   shift, and go to state 158
+    PRIVATE     shift, and go to state 159
+    PUBLIC      shift, and go to state 160
+    EXTERN      shift, and go to state 161
+    ';'         shift, and go to state 162
+    '~'         shift, and go to state 21
+
+    '}'  reduce using rule 217 (member_list_opt)
+
+    type_specifier               go to state 25
+    type_name                    go to state 82
+    non_reference_type           go to state 28
+    simple_signed_type           go to state 29
+    simple_type_name             go to state 30
+    scoped_identifier            go to state 69
+    variable_or_parameter        go to state 32
+    variable_specifier           go to state 33
+    multiple_variable_specifier  go to state 34
+    member_func_inlined          go to state 163
+    member_func_specifier        go to state 38
+    function_specifier           go to state 40
+    overloaded_op_specifier      go to state 42
+    destructor                   go to state 43
+    constructor                  go to state 45
+    enum_specifier               go to state 47
+    access_specifier_list        go to state 164
+    access_specifier             go to state 165
+    union_specifier              go to state 48
+    class_specifier              go to state 49
+    friend_specifier             go to state 166
+    member_list_opt              go to state 444
+    member_list                  go to state 168
+    member_or_error              go to state 169
+    member_with_access           go to state 170
+    member                       go to state 171
+    member_specifier             go to state 172
+    mem_type_specifier           go to state 51
+    template_specifier           go to state 173
+
+
+State 431
+
+  205 class_specifier: template_specifier CLASS IDENTIFIER '{' member_list_opt '}' .
+
+    $default  reduce using rule 205 (class_specifier)
+
+
+State 432
+
+  211 class_specifier: template_specifier STRUCT IDENTIFIER ':' superclass_list '{' . member_list_opt '}'
+
+    error       shift, and go to state 154
+    IDENTIFIER  shift, and go to state 80
+    CHAR        shift, and go to state 3
+    SHORT       shift, and go to state 4
+    INT         shift, and go to state 5
+    LONG        shift, and go to state 6
+    SIGNED      shift, and go to state 7
+    UNSIGNED    shift, and go to state 8
+    FLOAT       shift, and go to state 9
+    DOUBLE      shift, and go to state 10
+    VOID        shift, and go to state 11
+    TEMPLATE    shift, and go to state 12
+    FRIEND      shift, and go to state 155
+    OPERATOR    shift, and go to state 13
+    CONST       shift, and go to state 14
+    CLASS       shift, and go to state 156
+    STRUCT      shift, and go to state 157
+    UNION       shift, and go to state 17
+    ENUM        shift, and go to state 18
+    PROTECTED   shift, and go to state 158
+    PRIVATE     shift, and go to state 159
+    PUBLIC      shift, and go to state 160
+    EXTERN      shift, and go to state 161
+    ';'         shift, and go to state 162
+    '~'         shift, and go to state 21
+
+    '}'  reduce using rule 217 (member_list_opt)
+
+    type_specifier               go to state 25
+    type_name                    go to state 82
+    non_reference_type           go to state 28
+    simple_signed_type           go to state 29
+    simple_type_name             go to state 30
+    scoped_identifier            go to state 69
+    variable_or_parameter        go to state 32
+    variable_specifier           go to state 33
+    multiple_variable_specifier  go to state 34
+    member_func_inlined          go to state 163
+    member_func_specifier        go to state 38
+    function_specifier           go to state 40
+    overloaded_op_specifier      go to state 42
+    destructor                   go to state 43
+    constructor                  go to state 45
+    enum_specifier               go to state 47
+    access_specifier_list        go to state 164
+    access_specifier             go to state 165
+    union_specifier              go to state 48
+    class_specifier              go to state 49
+    friend_specifier             go to state 166
+    member_list_opt              go to state 445
+    member_list                  go to state 168
+    member_or_error              go to state 169
+    member_with_access           go to state 170
+    member                       go to state 171
+    member_specifier             go to state 172
+    mem_type_specifier           go to state 51
+    template_specifier           go to state 173
+
+
+State 433
+
+  210 class_specifier: template_specifier STRUCT IDENTIFIER '{' member_list_opt '}' .
+
+    $default  reduce using rule 210 (class_specifier)
+
+
+State 434
+
+  123 constructor_skeleton: IDENTIFIER '<' template_instance_arg_list '>' CLCL IDENTIFIER '(' . parameter_list_opt ')' throw_decl
+
+    IDENTIFIER  shift, and go to state 66
+    CHAR        shift, and go to state 3
+    SHORT       shift, and go to state 4
+    INT         shift, and go to state 5
+    LONG        shift, and go to state 6
+    SIGNED      shift, and go to state 7
+    UNSIGNED    shift, and go to state 8
+    FLOAT       shift, and go to state 9
+    DOUBLE      shift, and go to state 10
+    VOID        shift, and go to state 11
+    CONST       shift, and go to state 14
+    STRUCT      shift, and go to state 67
+    EXTERN      shift, and go to state 129
+    ELIPSIS     shift, and go to state 130
+
+    $default  reduce using rule 72 (parameter_list_opt)
+
+    type_name              go to state 131
+    non_reference_type     go to state 28
+    simple_signed_type     go to state 29
+    simple_type_name       go to state 30
+    scoped_identifier      go to state 69
+    variable_or_parameter  go to state 32
+    variable_specifier     go to state 132
+    parameter_list_opt     go to state 446
+    parameter_list         go to state 134
+    unnamed_parameter      go to state 135
+
+
+State 435
+
+  119 destructor_skeleton: IDENTIFIER '<' template_instance_arg_list '>' CLCL '~' IDENTIFIER . '(' ')'
+
+    '('  shift, and go to state 447
+
+
+State 436
+
+  204 class_specifier: CLASS IDENTIFIER ':' superclass_list '{' member_list_opt '}' .
+
+    $default  reduce using rule 204 (class_specifier)
+
+
+State 437
+
+  209 class_specifier: STRUCT IDENTIFIER ':' superclass_list '{' member_list_opt '}' .
+
+    $default  reduce using rule 209 (class_specifier)
+
+
+State 438
+
+  106 overloaded_op_skeleton: type_name IDENTIFIER CLCL OPERATOR any_operator '(' parameter_list_opt . ')'
+
+    ')'  shift, and go to state 448
+
+
+State 439
+
+  100 member_func_skel_spec: type_name IDENTIFIER '<' template_instance_arg_list '>' CLCL IDENTIFIER . '(' parameter_list_opt ')'
+
+    '('  shift, and go to state 449
+
+
+State 440
+
+  104 overloaded_op_skeleton: type_name scoped_identifier CLCL OPERATOR any_operator '(' parameter_list_opt . ')'
+
+    ')'  shift, and go to state 450
+
+
+State 441
+
+  124 constructor_skeleton: scoped_identifier '<' template_instance_arg_list '>' CLCL IDENTIFIER '(' . parameter_list_opt ')' throw_decl
+
+    IDENTIFIER  shift, and go to state 66
+    CHAR        shift, and go to state 3
+    SHORT       shift, and go to state 4
+    INT         shift, and go to state 5
+    LONG        shift, and go to state 6
+    SIGNED      shift, and go to state 7
+    UNSIGNED    shift, and go to state 8
+    FLOAT       shift, and go to state 9
+    DOUBLE      shift, and go to state 10
+    VOID        shift, and go to state 11
+    CONST       shift, and go to state 14
+    STRUCT      shift, and go to state 67
+    EXTERN      shift, and go to state 129
+    ELIPSIS     shift, and go to state 130
+
+    $default  reduce using rule 72 (parameter_list_opt)
+
+    type_name              go to state 131
+    non_reference_type     go to state 28
+    simple_signed_type     go to state 29
+    simple_type_name       go to state 30
+    scoped_identifier      go to state 69
+    variable_or_parameter  go to state 32
+    variable_specifier     go to state 132
+    parameter_list_opt     go to state 451
+    parameter_list         go to state 134
+    unnamed_parameter      go to state 135
+
+
+State 442
+
+  120 destructor_skeleton: scoped_identifier '<' template_instance_arg_list '>' CLCL '~' IDENTIFIER . '(' ')'
+
+    '('  shift, and go to state 452
+
+
+State 443
+
+  115 throw_list: throw_list ',' type_name .
+
+    $default  reduce using rule 115 (throw_list)
+
+
+State 444
+
+  206 class_specifier: template_specifier CLASS IDENTIFIER ':' superclass_list '{' member_list_opt . '}'
+
+    '}'  shift, and go to state 453
+
+
+State 445
+
+  211 class_specifier: template_specifier STRUCT IDENTIFIER ':' superclass_list '{' member_list_opt . '}'
+
+    '}'  shift, and go to state 454
+
+
+State 446
+
+  123 constructor_skeleton: IDENTIFIER '<' template_instance_arg_list '>' CLCL IDENTIFIER '(' parameter_list_opt . ')' throw_decl
+
+    ')'  shift, and go to state 455
+
+
+State 447
+
+  119 destructor_skeleton: IDENTIFIER '<' template_instance_arg_list '>' CLCL '~' IDENTIFIER '(' . ')'
+
+    ')'  shift, and go to state 456
+
+
+State 448
+
+  106 overloaded_op_skeleton: type_name IDENTIFIER CLCL OPERATOR any_operator '(' parameter_list_opt ')' .
+
+    $default  reduce using rule 106 (overloaded_op_skeleton)
+
+
+State 449
+
+  100 member_func_skel_spec: type_name IDENTIFIER '<' template_instance_arg_list '>' CLCL IDENTIFIER '(' . parameter_list_opt ')'
+
+    IDENTIFIER  shift, and go to state 66
+    CHAR        shift, and go to state 3
+    SHORT       shift, and go to state 4
+    INT         shift, and go to state 5
+    LONG        shift, and go to state 6
+    SIGNED      shift, and go to state 7
+    UNSIGNED    shift, and go to state 8
+    FLOAT       shift, and go to state 9
+    DOUBLE      shift, and go to state 10
+    VOID        shift, and go to state 11
+    CONST       shift, and go to state 14
+    STRUCT      shift, and go to state 67
+    EXTERN      shift, and go to state 129
+    ELIPSIS     shift, and go to state 130
+
+    $default  reduce using rule 72 (parameter_list_opt)
+
+    type_name              go to state 131
+    non_reference_type     go to state 28
+    simple_signed_type     go to state 29
+    simple_type_name       go to state 30
+    scoped_identifier      go to state 69
+    variable_or_parameter  go to state 32
+    variable_specifier     go to state 132
+    parameter_list_opt     go to state 457
+    parameter_list         go to state 134
+    unnamed_parameter      go to state 135
+
+
+State 450
+
+  104 overloaded_op_skeleton: type_name scoped_identifier CLCL OPERATOR any_operator '(' parameter_list_opt ')' .
+
+    $default  reduce using rule 104 (overloaded_op_skeleton)
+
+
+State 451
+
+  124 constructor_skeleton: scoped_identifier '<' template_instance_arg_list '>' CLCL IDENTIFIER '(' parameter_list_opt . ')' throw_decl
+
+    ')'  shift, and go to state 458
+
+
+State 452
+
+  120 destructor_skeleton: scoped_identifier '<' template_instance_arg_list '>' CLCL '~' IDENTIFIER '(' . ')'
+
+    ')'  shift, and go to state 459
+
+
+State 453
+
+  206 class_specifier: template_specifier CLASS IDENTIFIER ':' superclass_list '{' member_list_opt '}' .
+
+    $default  reduce using rule 206 (class_specifier)
+
+
+State 454
+
+  211 class_specifier: template_specifier STRUCT IDENTIFIER ':' superclass_list '{' member_list_opt '}' .
+
+    $default  reduce using rule 211 (class_specifier)
+
+
+State 455
+
+  123 constructor_skeleton: IDENTIFIER '<' template_instance_arg_list '>' CLCL IDENTIFIER '(' parameter_list_opt ')' . throw_decl
+
+    THROW  shift, and go to state 261
+
+    $default  reduce using rule 112 (throw_decl)
+
+    throw_decl  go to state 460
+
+
+State 456
+
+  119 destructor_skeleton: IDENTIFIER '<' template_instance_arg_list '>' CLCL '~' IDENTIFIER '(' ')' .
+
+    $default  reduce using rule 119 (destructor_skeleton)
+
+
+State 457
+
+  100 member_func_skel_spec: type_name IDENTIFIER '<' template_instance_arg_list '>' CLCL IDENTIFIER '(' parameter_list_opt . ')'
+
+    ')'  shift, and go to state 461
+
+
+State 458
+
+  124 constructor_skeleton: scoped_identifier '<' template_instance_arg_list '>' CLCL IDENTIFIER '(' parameter_list_opt ')' . throw_decl
+
+    THROW  shift, and go to state 261
+
+    $default  reduce using rule 112 (throw_decl)
+
+    throw_decl  go to state 462
+
+
+State 459
+
+  120 destructor_skeleton: scoped_identifier '<' template_instance_arg_list '>' CLCL '~' IDENTIFIER '(' ')' .
+
+    $default  reduce using rule 120 (destructor_skeleton)
+
+
+State 460
+
+  123 constructor_skeleton: IDENTIFIER '<' template_instance_arg_list '>' CLCL IDENTIFIER '(' parameter_list_opt ')' throw_decl .
+
+    $default  reduce using rule 123 (constructor_skeleton)
+
+
+State 461
+
+  100 member_func_skel_spec: type_name IDENTIFIER '<' template_instance_arg_list '>' CLCL IDENTIFIER '(' parameter_list_opt ')' .
+
+    $default  reduce using rule 100 (member_func_skel_spec)
+
+
+State 462
+
+  124 constructor_skeleton: scoped_identifier '<' template_instance_arg_list '>' CLCL IDENTIFIER '(' parameter_list_opt ')' throw_decl .
+
+    $default  reduce using rule 124 (constructor_skeleton)

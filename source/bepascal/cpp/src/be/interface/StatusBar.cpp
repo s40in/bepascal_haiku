@@ -635,19 +635,6 @@ BStatusBar_GetSupportedSuites(BStatusBar *StatusBar, BMessage *data)
 }
 
 
-/***********************************************************************
- *  Method: BStatusBar::Perform
- *  Params: perform_code d, void *arg
- * Returns: status_t
- * Effects: 
- ***********************************************************************/
-status_t
-BStatusBar_Perform(BStatusBar *StatusBar, perform_code d, void *arg)
-{
-   return StatusBar->Perform(d, arg);
-}
-
-
 
 #if defined(__cplusplus)
 }

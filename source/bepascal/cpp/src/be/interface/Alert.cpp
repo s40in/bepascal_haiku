@@ -83,7 +83,6 @@ virtual	bool		QuitRequested();
 static	BPoint		AlertPosition(float width, float height);
 
 /*----- Private or reserved -----------------------------------------*/
-//virtual status_t	Perform(perform_code d, void *arg);
 
 private:
 /*
@@ -455,17 +454,6 @@ BAlert_AlertPosition(BAlert *Alert, float width, float height)
 }
 
 
-/*
- *  Method: BAlert::Perform()
- *   Descr: 
- */
-/*
-status_t
-BAlert_Perform(BAlert *Alert, perform_code d, void *arg)
-{
-   return Alert->Perform(d, arg);
-}
-*/
 
 /*
  *  Method: BAlert::_ReservedAlert1()

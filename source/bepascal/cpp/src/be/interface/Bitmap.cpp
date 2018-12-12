@@ -86,7 +86,6 @@ virtual	bool		RemoveChild(BView *view);
 		void		Unlock();
 		bool		IsLocked() const;
 
-virtual status_t	Perform(perform_code d, void *arg);
 
 /*----- Private or reserved -----------------------------------------*/
 private:
@@ -288,13 +287,6 @@ BPBitmap::IsLocked(void) const
 	return BBitmap::IsLocked();
 }
 
-#ifndef __HAIKU__
-status_t
-BPBitmap::Perform(perform_code d, void *arg)
-{
-	return BBitmap::Perform(d, arg);
-}
-#endif
 
 /*-------------------------------------------------------------*/
 
@@ -608,17 +600,6 @@ BBitmap_IsLocked(BBitmap *Bitmap)
 }
 
 
-/*
- *  Method: BBitmap::Perform
- *  Descr:
- */
-#ifndef __HAIKU__
-status_t
-BBitmap_Perform(BBitmap *Bitmap, perform_code d, void *arg)
-{
-   return Bitmap->Perform(d, arg);
-}
-#endif
 
 /*
  *  Method: BBitmap::_ReservedBitmap1

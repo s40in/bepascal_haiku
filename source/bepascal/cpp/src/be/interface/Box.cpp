@@ -81,7 +81,6 @@ public:
 
 /*----- Private or reserved -----------------------------------------*/
 
-//	virtual status_t	Perform(perform_code d, void *arg);
 
 private:
 /*
@@ -571,17 +570,6 @@ BBox_GetSupportedSuites(BBox *Box, BMessage *data)
    return Box->GetSupportedSuites(data);
 }
 
-
-/*
- *  Method: BBox::Perform()
- *   Descr: 
- */
-status_t
-BBox_Perform(BBox *Box, perform_code d,
-              void *arg)
-{
-   return Box->Perform(d, arg);
-}
 
 
 /*

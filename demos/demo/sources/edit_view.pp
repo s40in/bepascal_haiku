@@ -28,7 +28,7 @@ uses
 type 
 	TEdit_View = class(BView)
  	public
-   	constructor Create(aframe : BRect; name : PChar; aresizingMode, flags : Cardinal); 
+   	
 
    	aTextView : BTextView;
  		Edit : BTextControl;
@@ -43,6 +43,8 @@ type
 		RadioButton3,
 		RadioButton4 : BRadioButton;	
 		scroll_vert : BscrollView;
+
+	constructor Create(aframe : BRect; name : PChar; aresizingMode, flags : Cardinal); 
   end;
 
 implementation

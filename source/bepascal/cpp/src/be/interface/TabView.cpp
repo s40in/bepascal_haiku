@@ -112,7 +112,7 @@ public:
 						BPTabView(TPasObject PasObject,BMessage*);							
 static	BArchivable*	Instantiate(BMessage*);
 //virtual	status_t		Archive(BMessage*, bool deep=true) const;
-//virtual status_t		Perform(perform_code d, void *arg);
+
 
 virtual void 			WindowActivated(bool state);
 virtual void 			AttachedToWindow();		
@@ -388,19 +388,6 @@ BTab_Archive(BTab *Tab, BMessage *data, bool deep)
 
 
 /***********************************************************************
- *  Method: BTab::Perform
- *  Params: uint32 d, void *arg
- * Returns: status_t
- * Effects: 
- ***********************************************************************/
-status_t
-BTab_Perform(BTab *Tab, uint32 d, void *arg)
-{
-   return Tab->Perform(d, arg);
-}
-
-
-/***********************************************************************
  *  Method: BTab::Label
  *  Params: 
  * Returns: const char *
@@ -642,19 +629,6 @@ status_t
 BTabView_Archive(BTabView *TabView, BMessage *msg, bool deep) 
 {
    return TabView->Archive(msg, deep);
-}
-
-
-/***********************************************************************
- *  Method: BTabView::Perform
- *  Params: perform_code d, void *arg
- * Returns: status_t
- * Effects: 
- ***********************************************************************/
-status_t
-BTabView_Perform(BTabView *TabView, perform_code d, void *arg)
-{
-   return TabView->Perform(d, arg);
 }
 
 

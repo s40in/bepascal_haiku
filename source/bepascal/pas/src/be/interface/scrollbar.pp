@@ -61,7 +61,6 @@ type
     procedure AllAttached;override;
     procedure AllDetached;override;
     function GetSupportedSuites(data : BMessage) : Status_t;
-    function Perform(d : Perform_code; arg : Pointer) : Status_t;
   end;
 
 function BScrollBar_Create(AObject : TBeObject;frame : TCPlusObject; name : pchar; target : TCPlusObject; min,max : real; direction : Orientation): TCPlusObject; cdecl; external BePascalLibName name 'BScrollBar_Create';
@@ -98,7 +97,6 @@ procedure BScrollBar_MakeFocus(AObject : TCPlusObject; state : boolean); cdecl; 
 procedure BScrollBar_AllAttached(AObject : TCPlusObject); cdecl; external BePascalLibName name 'BScrollBar_AllAttached';
 procedure BScrollBar_AllDetached(AObject : TCPlusObject); cdecl; external BePascalLibName name 'BScrollBar_AllDetached';
 function BScrollBar_GetSupportedSuites(AObject : TCPlusObject; data : TCPlusObject) : Status_t; cdecl; external BePascalLibName name 'BScrollBar_GetSupportedSuites';
-function BScrollBar_Perform(AObject : TCPlusObject; d : Perform_code; arg : Pointer) : Status_t; cdecl; external BePascalLibName name 'BScrollBar_Perform';
 
 implementation
 
@@ -273,11 +271,6 @@ end;
 function  BScrollBar.GetSupportedSuites(data : BMessage) : Status_t;
 begin
   Result := BScrollBar_GetSupportedSuites(CPlusObject, data.CPlusObject);
-end;
-
-function  BScrollBar.Perform(d : Perform_code; arg : Pointer) : Status_t;
-begin
-  Result := BScrollBar_Perform(CPlusObject, d, arg);
 end;
 
 

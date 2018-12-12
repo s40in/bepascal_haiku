@@ -137,19 +137,6 @@ BPicture_Archive(BPicture *Picture, BMessage *data, bool deep)
 
 
 /***********************************************************************
- *  Method: BPicture::Perform
- *  Params: perform_code d, void *arg
- * Returns: status_t
- * Effects: 
- ***********************************************************************/
-status_t
-BPicture_Perform(BPicture *Picture, perform_code d, void *arg)
-{
-   return Picture->Perform(d, arg);
-}
-
-
-/***********************************************************************
  *  Method: BPicture::Play
  *  Params: void **callBackTable, int32 tableEntries, void *userData
  * Returns: status_t

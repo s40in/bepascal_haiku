@@ -102,7 +102,6 @@ type
     procedure InvalidateLayout;
     function ResolveSpecifier(msg : BMessage; index : integer; specifier : BMessage; form : integer; aProperty : PChar) : BHandler;
     function GetSupportedSuites(data : BMessage) : Status_t;
-    function Perform(d : Perform_code; arg : Pointer) : Status_t;
     procedure MakeFocus(state : boolean);
     procedure AllAttached; override;
     procedure AllDetached; override;
@@ -426,7 +425,6 @@ procedure BMenu_FrameResized(AObject : TCPlusObject; new_width : double; new_hei
 procedure BMenu_InvalidateLayout(AObject : TCPlusObject); cdecl; external BePascalLibName name 'BMenu_InvalidateLayout';
 function BMenu_ResolveSpecifier(AObject : TCPlusObject; msg : TCPlusObject; index : integer; specifier : TCPlusObject; form : integer; aProperty : PChar) : BHandler; cdecl; external BePascalLibName name 'BMenu_ResolveSpecifier';
 function BMenu_GetSupportedSuites(AObject : TCPlusObject; data : TCPlusObject) : Status_t; cdecl; external BePascalLibName name 'BMenu_GetSupportedSuites';
-function BMenu_Perform(AObject : TCPlusObject; d : Perform_code; arg : Pointer) : Status_t; cdecl; external BePascalLibName name 'BMenu_Perform';
 procedure BMenu_MakeFocus(AObject : TCPlusObject; state : boolean); cdecl; external BePascalLibName name 'BMenu_MakeFocus';
 procedure BMenu_AllAttached(AObject : TCPlusObject); cdecl; external BePascalLibName name 'BMenu_AllAttached';
 procedure BMenu_AllDetached(AObject : TCPlusObject); cdecl; external BePascalLibName name 'BMenu_AllDetached';
@@ -592,7 +590,6 @@ procedure BMenu_FrameResized(AObject : TCPlusObject; new_width : double; new_hei
 procedure BMenu_InvalidateLayout(AObject : TCPlusObject); cdecl; external BePascalLibName name 'BMenu_InvalidateLayout';
 function BMenu_ResolveSpecifier(AObject : TCPlusObject; msg : BMessage; index : integer; specifier : BMessage; form : integer; aProperty : PChar) : BHandler; cdecl; external BePascalLibName name 'BMenu_ResolveSpecifier';
 function BMenu_GetSupportedSuites(AObject : TCPlusObject; data : BMessage) : Status_t; cdecl; external BePascalLibName name 'BMenu_GetSupportedSuites';
-function BMenu_Perform(AObject : TCPlusObject; d : BPerform_code; arg : Pointer) : Status_t; cdecl; external BePascalLibName name 'BMenu_Perform';
 procedure BMenu_MakeFocus(AObject : TCPlusObject; state : boolean); cdecl; external BePascalLibName name 'BMenu_MakeFocus';
 procedure BMenu_AllAttached(AObject : TCPlusObject); cdecl; external BePascalLibName name 'BMenu_AllAttached';
 procedure BMenu_AllDetached(AObject : TCPlusObject); cdecl; external BePascalLibName name 'BMenu_AllDetached';
@@ -1066,10 +1063,6 @@ begin
   Result := BMenu_GetSupportedSuites(CPlusObject, data.CPlusObject);
 end;
 
-function BMenu.Perform(d : Perform_code; arg : Pointer) : Status_t;
-begin
-  Result := BMenu_Perform(CPlusObject, d, arg);
-end;
 
 procedure BMenu.MakeFocus(state : boolean);
 begin

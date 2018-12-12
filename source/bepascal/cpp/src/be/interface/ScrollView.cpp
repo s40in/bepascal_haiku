@@ -568,20 +568,6 @@ BScrollView_GetSupportedSuites(BScrollView *ScrollView, BMessage *data)
 }
 
 
-/***********************************************************************
- *  Method: BScrollView::Perform
- *  Params: perform_code d, void *arg
- * Returns: status_t
- * Effects: 
- ***********************************************************************/
-status_t
-BScrollView_Perform(BScrollView *ScrollView, perform_code d, void *arg)
-{
-   return ScrollView->Perform(d, arg);
-}
-
-
-
 
 #if defined(__cplusplus)
 }

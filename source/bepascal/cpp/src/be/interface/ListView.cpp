@@ -893,18 +893,6 @@ BListView_GetSupportedSuites(BListView *ListView, BMessage *data)
 }
 
 
-/***********************************************************************
- *  Method: BListView::Perform
- *  Params: perform_code d, void *arg
- * Returns: status_t
- * Effects: 
- ***********************************************************************/
-status_t
-BListView_Perform(BListView *ListView, perform_code d, void *arg)
-{
-   return ListView->Perform(d, arg);
-}
-
 
 /***********************************************************************
  *  Method: BListView::WindowActivated

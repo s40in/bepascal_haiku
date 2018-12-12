@@ -47,7 +47,7 @@ RSRCS on $(NAME) =  ;
 #		naming scheme you need to specify the path to the library
 #		and it's name
 #		library: my_lib.a entry: my_lib.a or path/my_lib.a
-LIBS on $(NAME) +=  root ;
+LIBS on $(NAME) +=  root;
 
 # Specify additional paths to directories following the standard
 #	libXXX.so or libXXX.a naming scheme.  You can specify full paths
@@ -55,57 +55,57 @@ LIBS on $(NAME) +=  root ;
 #	be recursive, so include all of the paths where libraries can
 #	be found.  Directories where source files are found are
 #	automatically included.
-LIBPATHS on $(NAME) =  ;
+##LIBPATHS on $(NAME) =  ;
 
 # Additional paths to look for system headers
 #	These use the form: #include <header>
 #	source file directories are NOT auto-included here
-SYSTEM_INCLUDE_PATHS on $(NAME) =  ;
+##SYSTEM_INCLUDE_PATHS on $(NAME) =  ;
 
 # Additional paths to look for local headers
 #	thes use the form: #include "header"
 #	source file directories are automatically included
-LOCAL_INCLUDE_PATHS on $(NAME) =  ;
+##LOCAL_INCLUDE_PATHS on $(NAME) =  ;
 
 # Specify the level of optimization that you desire
 #	NONE, SOME, FULL
-OPTIMIZE on $(NAME) =  ;
+##OPTIMIZE on $(NAME) =  ;
 
 # Specify any preprocessor symbols to be defined.  The symbols will not
 #	have their values set automatically; you must supply the value (if any)
 #	to use.  For example, setting DEFINES to "DEBUG=1" will cause the
 #	compiler option "-DDEBUG=1" to be used.  Setting DEFINES to "DEBUG"
 #	would pass "-DDEBUG" on the compiler's command line.
-DEFINES on $(NAME) =  ;
+##DEFINES on $(NAME) =  ;
 
 # Specify special warning levels
 #	if unspecified default warnings will be used
 #	NONE = supress all warnings
 #	ALL = enable all warnings
-WARNINGS on $(NAME) =  ;
+##WARNINGS on $(NAME) =  ;
 
 # Specify whether image symbols will be created
 #	so that stack crawls in the debugger are meaningful
 #	if TRUE symbols will be created
-SYMBOLS on $(NAME) =  ;
+##SYMBOLS on $(NAME) =  ;
 
 # Specify debug settings
 #	if TRUE will allow application to be run from a source-level
 #	debugger.  Note that this will disable all optimzation.
-DEBUGGER on $(NAME) =  ;
+##DEBUGGER on $(NAME) =  ;
 
 # Specify additional compiler flags for all files
-COMPILER_FLAGS on $(NAME) =  ;
+##COMPILER_FLAGS on $(NAME) =  ;
 
 # Specify additional linker flags
-LINKER_FLAGS on $(NAME) =  ;
+##LINKER_FLAGS on $(NAME) =  ;
 
 # (for TYPE == DRIVER only) Specify desired location of driver in the /dev
 #	hierarchy. Used by the driverinstall rule. E.g., DRIVER_PATH = video/usb will
 #	instruct the driverinstall rule to place a symlink to your driver's binary in
 #	~/add-ons/kernel/drivers/dev/video/usb, so that your driver will appear at
 #	/dev/video/usb when loaded. Default is "misc".
-DRIVER_PATH on $(NAME) =  ;
+##DRIVER_PATH on $(NAME) =  ;
 
 ## Include the Jamfile-engine
 #include $(BUILDHOME)/etc/Jamfile-engine ;
@@ -113,8 +113,8 @@ DRIVER_PATH on $(NAME) =  ;
 # Specify the name of the binary
 #	If the name has spaces, you must quote it: "My App"
 
-BeMain libstubgen.so : parser.y
-        lexer.l
+BeMain libstubgen.so : parser.c
+        lexer.c
         getopt.c 
         main.c 
         pathname.c

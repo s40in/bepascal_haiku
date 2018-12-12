@@ -1,20 +1,19 @@
-/* A Bison parser, made by GNU Bison 2.4.3.  */
+/* A Bison parser, made by GNU Bison 3.0.5.  */
 
-/* Skeleton interface for Bison's Yacc-like parsers in C
-   
-      Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2009, 2010 Free Software Foundation, Inc.
-   
+/* Bison interface for Yacc-like parsers in C
+
+   Copyright (C) 1984, 1989-1990, 2000-2015, 2018 Free Software Foundation, Inc.
+
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
@@ -27,69 +26,77 @@
    special exception, which will cause the skeleton and the resulting
    Bison output files to be licensed under the GNU General Public
    License without this special exception.
-   
+
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
+#ifndef YY_YY_Y_TAB_H_INCLUDED
+# define YY_YY_Y_TAB_H_INCLUDED
+/* Debug traces.  */
+#ifndef YYDEBUG
+# define YYDEBUG 0
+#endif
+#if YYDEBUG
+extern int yydebug;
+#endif
 
-/* Tokens.  */
+/* Token type.  */
 #ifndef YYTOKENTYPE
 # define YYTOKENTYPE
-   /* Put the tokens into the symbol table, so that GDB and other debuggers
-      know about them.  */
-   enum yytokentype {
-     IDENTIFIER = 258,
-     CONSTANT = 259,
-     STRING_LITERAL = 260,
-     CHAR = 261,
-     SHORT = 262,
-     INT = 263,
-     LONG = 264,
-     SIGNED = 265,
-     UNSIGNED = 266,
-     FLOAT = 267,
-     DOUBLE = 268,
-     VOID = 269,
-     NEW = 270,
-     DELETE = 271,
-     TEMPLATE = 272,
-     THROW = 273,
-     PTR_OP = 274,
-     INC_OP = 275,
-     DEC_OP = 276,
-     LEFT_OP = 277,
-     RIGHT_OP = 278,
-     LE_OP = 279,
-     GE_OP = 280,
-     EQ_OP = 281,
-     NE_OP = 282,
-     AND_OP = 283,
-     OR_OP = 284,
-     MUL_ASSIGN = 285,
-     DIV_ASSIGN = 286,
-     MOD_ASSIGN = 287,
-     ADD_ASSIGN = 288,
-     SUB_ASSIGN = 289,
-     LEFT_ASSIGN = 290,
-     RIGHT_ASSIGN = 291,
-     AND_ASSIGN = 292,
-     XOR_ASSIGN = 293,
-     OR_ASSIGN = 294,
-     CLCL = 295,
-     MEM_PTR_OP = 296,
-     FRIEND = 297,
-     OPERATOR = 298,
-     CONST = 299,
-     CLASS = 300,
-     STRUCT = 301,
-     UNION = 302,
-     ENUM = 303,
-     PROTECTED = 304,
-     PRIVATE = 305,
-     PUBLIC = 306,
-     EXTERN = 307,
-     ELIPSIS = 308
-   };
+  enum yytokentype
+  {
+    IDENTIFIER = 258,
+    CONSTANT = 259,
+    STRING_LITERAL = 260,
+    CHAR = 261,
+    SHORT = 262,
+    INT = 263,
+    LONG = 264,
+    SIGNED = 265,
+    UNSIGNED = 266,
+    FLOAT = 267,
+    DOUBLE = 268,
+    VOID = 269,
+    NEW = 270,
+    DELETE = 271,
+    TEMPLATE = 272,
+    THROW = 273,
+    PTR_OP = 274,
+    INC_OP = 275,
+    DEC_OP = 276,
+    LEFT_OP = 277,
+    RIGHT_OP = 278,
+    LE_OP = 279,
+    GE_OP = 280,
+    EQ_OP = 281,
+    NE_OP = 282,
+    AND_OP = 283,
+    OR_OP = 284,
+    MUL_ASSIGN = 285,
+    DIV_ASSIGN = 286,
+    MOD_ASSIGN = 287,
+    ADD_ASSIGN = 288,
+    SUB_ASSIGN = 289,
+    LEFT_ASSIGN = 290,
+    RIGHT_ASSIGN = 291,
+    AND_ASSIGN = 292,
+    XOR_ASSIGN = 293,
+    OR_ASSIGN = 294,
+    CLCL = 295,
+    MEM_PTR_OP = 296,
+    FRIEND = 297,
+    OPERATOR = 298,
+    CONST = 299,
+    CLASS = 300,
+    STRUCT = 301,
+    UNION = 302,
+    ENUM = 303,
+    PROTECTED = 304,
+    PRIVATE = 305,
+    PUBLIC = 306,
+    EXTERN = 307,
+    ELIPSIS = 308
+  };
 #endif
 /* Tokens.  */
 #define IDENTIFIER 258
@@ -144,31 +151,29 @@
 #define EXTERN 307
 #define ELIPSIS 308
 
-
-
-
+/* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef union YYSTYPE
-{
 
-/* Line 1685 of yacc.c  */
-#line 366 "source/tools/stubgen.so/cpp/parser.y"
+union YYSTYPE
+{
+#line 366 "parser.y" /* yacc.c:1910  */
 
   char *string;
   syntaxelem_t *elt;
   arg_t *arg;
   int flag;
 
+#line 167 "y.tab.h" /* yacc.c:1910  */
+};
 
-
-/* Line 1685 of yacc.c  */
-#line 166 "y.tab.h"
-} YYSTYPE;
+typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
-# define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
 #endif
 
+
 extern YYSTYPE yylval;
 
+int yyparse (void);
 
+#endif /* !YY_YY_Y_TAB_H_INCLUDED  */

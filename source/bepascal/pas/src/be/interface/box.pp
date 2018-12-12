@@ -63,7 +63,6 @@ type
     procedure GetPreferredSize(width : double; height : double);
     procedure MakeFocus(state : boolean);
     function GetSupportedSuites(data : BMessage) : Status_t;
-    function Perform(d : Perform_code; arg : Pointer) : Status_t;
   end;
 
 function BBox_Create(AObject : TBeObject; Frame : TCPlusObject;Name : PChar; ResizingMode, Flags : Cardinal; BorderStyle : border_style) : TCPlusObject; cdecl; external BePascalLibName name 'BBox_Create';
@@ -100,8 +99,6 @@ procedure BBox_ResizeToPreferred(AObject : TCPlusObject); cdecl; external BePasc
 procedure BBox_GetPreferredSize(AObject : TCPlusObject; width : double; height : double); cdecl; external BePascalLibName name 'BBox_GetPreferredSize';
 procedure BBox_MakeFocus(AObject : TCPlusObject; state : boolean); cdecl; external BePascalLibName name 'BBox_MakeFocus';
 function BBox_GetSupportedSuites(AObject : TCPlusObject; data : TCPlusObject) : Status_t; cdecl; external BePascalLibName name 'BBox_GetSupportedSuites';
-function BBox_Perform(AObject : TCPlusObject; d : Perform_code; arg : Pointer) : Status_t; cdecl; external BePascalLibName name 'BBox_Perform';
-
 
 implementation
 
@@ -251,11 +248,6 @@ end;
 function BBox.GetSupportedSuites(data : BMessage) : Status_t;
 begin
   Result := BBox_GetSupportedSuites(CPlusObject, data.CPlusObject);
-end;
-
-function BBox.Perform(d : Perform_code; arg : Pointer) : Status_t;
-begin
-  Result := BBox_Perform(CPlusObject, d, arg);
 end;
 
 

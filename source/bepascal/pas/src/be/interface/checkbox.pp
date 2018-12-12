@@ -51,7 +51,7 @@ type BCheckBox  = class(BControl)
     procedure MakeFocus(state : boolean);
     procedure AllAttached;override;
     procedure AllDetached;override;
-    function Perform(d : Perform_code; arg : Pointer) : Status_t;
+
   end;
 
 procedure BCheckBox_Free(AObject : TCPlusObject); cdecl; external BePascalLibName name 'BCheckBox_FREE';
@@ -79,7 +79,6 @@ function BCheckBox_GetSupportedSuites(AObject : TCPlusObject; data : TCPlusObjec
 procedure BCheckBox_MakeFocus(AObject : TCPlusObject; state : boolean); cdecl; external BePascalLibName name 'BCheckBox_MakeFocus';
 procedure BCheckBox_AllAttached(AObject : TCPlusObject); cdecl; external BePascalLibName name 'BCheckBox_AllAttached';
 procedure BCheckBox_AllDetached(AObject : TCPlusObject); cdecl; external BePascalLibName name 'BCheckBox_AllDetached';
-function BCheckBox_Perform(AObject : TCPlusObject; d : Perform_code; arg : Pointer) : Status_t; cdecl; external BePascalLibName name 'BCheckBox_Perform';
 
 implementation
 
@@ -211,10 +210,6 @@ begin
   BCheckBox_AllDetached(CPlusObject);
 end;
 
-function BCheckBox.Perform(d : Perform_code; arg : Pointer) : Status_t;
-begin
-  Result := BCheckBox_Perform(CPlusObject, d, arg);
-end;
 
 {procedure ._ReservedCheckBox1;
 begin

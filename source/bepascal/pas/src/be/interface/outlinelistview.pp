@@ -62,7 +62,6 @@ type
     function IsExpanded(fullListIndex : integer) : boolean;
     function ResolveSpecifier(msg : BMessage; index : integer; specifier : BMessage; form : integer; properti : PChar) : BHandler;
     function GetSupportedSuites(data : BMessage) : Status_t;
-    function Perform(d : Perform_code; arg : Pointer) : Status_t;
     procedure ResizeToPreferred;override;
     procedure GetPreferredSize(width : double; height : double);
     procedure MakeFocus(state : boolean);
@@ -109,7 +108,6 @@ procedure BOutlineListView_Collapse(AObject : TCPlusObject; item : TCPlusObject)
 function BOutlineListView_IsExpanded(AObject : TCPlusObject; fullListIndex : integer) : boolean; cdecl; external BePascalLibName name 'BOutlineListView_IsExpanded';
 function BOutlineListView_ResolveSpecifier(AObject : TCPlusObject; msg : TCPlusObject; index : integer; specifier : TCPlusObject; form : integer; properti : PChar) : BHandler; cdecl; external BePascalLibName name 'BOutlineListView_ResolveSpecifier';
 function BOutlineListView_GetSupportedSuites(AObject : TCPlusObject; data : TCPlusObject) : Status_t; cdecl; external BePascalLibName name 'BOutlineListView_GetSupportedSuites';
-function BOutlineListView_Perform(AObject : TCPlusObject; d : Perform_code; arg : Pointer) : Status_t; cdecl; external BePascalLibName name 'BOutlineListView_Perform';
 procedure BOutlineListView_ResizeToPreferred(AObject : TCPlusObject); cdecl; external BePascalLibName name 'BOutlineListView_ResizeToPreferred';
 procedure BOutlineListView_GetPreferredSize(AObject : TCPlusObject; width : double; height : double); cdecl; external BePascalLibName name 'BOutlineListView_GetPreferredSize';
 procedure BOutlineListView_MakeFocus(AObject : TCPlusObject; state : boolean); cdecl; external BePascalLibName name 'BOutlineListView_MakeFocus';
@@ -295,11 +293,6 @@ end;
 function BOutlineListView.GetSupportedSuites(data : BMessage) : Status_t;
 begin
   Result := BOutlineListView_GetSupportedSuites(CPlusObject, data.CPlusObject);
-end;
-
-function BOutlineListView.Perform(d : Perform_code; arg : Pointer) : Status_t;
-begin
-  Result := BOutlineListView_Perform(CPlusObject, d, arg);
 end;
 
 procedure BOutlineListView.ResizeToPreferred;

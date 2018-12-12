@@ -93,7 +93,6 @@ type
     function ItemFrame(index : integer) : BRect;
     function ResolveSpecifier(msg : BMessage; index : integer; specifier : BMessage; form : integer; properti : PChar) : BHandler;
     function GetSupportedSuites(data : BMessage) : Status_t;
-    function Perform(d : Perform_code; arg : Pointer) : Status_t;
     procedure WindowActivated(state : boolean);override;
     procedure MouseUp(pt : BPoint);override;
     procedure MouseMoved(pt : BPoint; code : Cardinal; msg : BMessage);override;
@@ -165,7 +164,6 @@ procedure BListView_FrameMoved(AObject : TCPlusObject; new_position : TCPlusObje
 function BListView_ItemFrame(AObject : TCPlusObject; index : integer) : BRect; cdecl; external BePascalLibName name 'BListView_ItemFrame';
 function BListView_ResolveSpecifier(AObject : TCPlusObject; msg : TCPlusObject; index : integer; specifier : TCPlusObject; form : integer; properti : PChar) : BHandler; cdecl; external BePascalLibName name 'BListView_ResolveSpecifier';
 function BListView_GetSupportedSuites(AObject : TCPlusObject; data : TCPlusObject) : Status_t; cdecl; external BePascalLibName name 'BListView_GetSupportedSuites';
-function BListView_Perform(AObject : TCPlusObject; d : Perform_code; arg : Pointer) : Status_t; cdecl; external BePascalLibName name 'BListView_Perform';
 procedure BListView_WindowActivated(AObject : TCPlusObject; state : boolean); cdecl; external BePascalLibName name 'BListView_WindowActivated';
 procedure BListView_MouseUp(AObject : TCPlusObject; pt : TCPlusObject); cdecl; external BePascalLibName name 'BListView_MouseUp';
 procedure BListView_MouseMoved(AObject : TCPlusObject; pt : TCPlusObject; code : Cardinal; msg : TCPlusObject); cdecl; external BePascalLibName name 'BListView_MouseMoved';
@@ -479,11 +477,6 @@ end;
 function BListView.GetSupportedSuites(data : BMessage) : Status_t;
 begin
   Result := BListView_GetSupportedSuites(CPlusObject, data.CPlusObject);
-end;
-
-function BListView.Perform(d : Perform_code; arg : Pointer) : Status_t;
-begin
-  Result := BListView_Perform(CPlusObject, d, arg);
 end;
 
 procedure BListView.WindowActivated(state : boolean);

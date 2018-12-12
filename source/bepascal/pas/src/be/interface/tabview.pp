@@ -36,7 +36,6 @@ type
     destructor Destroy;override;
     function Instantiate(data : BMessage) : BArchivable;
     function Archive(data : BMessage; deep : boolean) : Status_t;
-    function Perform(d : Cardinal; arg : Pointer) : Status_t;
     function GetLabel : PChar;
     procedure SetLabel(alabel : PChar);
     function IsSelected : boolean;
@@ -63,7 +62,6 @@ type
     constructor Create(msg : BMessage);virtual;
     function Instantiate( msg: BMessage) : BArchivable;
     function Archive( msg : BMessage; deep : boolean) : Status_t;
-    function Perform(d : Perform_code; arg : Pointer) : Status_t;
     procedure WindowActivated(state : boolean);override;
     procedure AttachedToWindow;override;
     procedure AllAttached;override;
@@ -109,7 +107,6 @@ procedure BTab_Free(AObject : TCPlusObject); cdecl; external BePascalLibName nam
 function BTab_Create_1(AObject : TBeObject; data : TCPlusObject): TCPlusObject; cdecl; external BePascalLibName name 'BTab_Create_1';
 function BTab_Instantiate(AObject : TCPlusObject; data : TCPlusObject) : BArchivable; cdecl; external BePascalLibName name 'BTab_Instantiate';
 function BTab_Archive(AObject : TCPlusObject; data : TCPlusObject; deep : boolean) : Status_t; cdecl; external BePascalLibName name 'BTab_Archive';
-function BTab_Perform(AObject : TCPlusObject; d : Cardinal; arg : Pointer) : Status_t; cdecl; external BePascalLibName name 'BTab_Perform';
 function BTab_Label(AObject : TCPlusObject) : PChar; cdecl; external BePascalLibName name 'BTab_Label';
 procedure BTab_SetLabel(AObject : TCPlusObject; alabel : PChar); cdecl; external BePascalLibName name 'BTab_SetLabel';
 function BTab_IsSelected(AObject : TCPlusObject) : boolean; cdecl; external BePascalLibName name 'BTab_IsSelected';
@@ -130,7 +127,6 @@ function BTabView_Create(AObject : TBeObject;frame : TCPlusObject; name : Pchar;
 function BTabView_Create_1(AObject : TBeObject; msg : TCPlusObject): TCPlusObject; cdecl; external BePascalLibName name 'BTabView_Create_1';
 function BTabView_Instantiate(AObject : TCPlusObject; msg : TCPlusObject) : BArchivable; cdecl; external BePascalLibName name 'BTabView_Instantiate';
 function BTabView_Archive(AObject : TCPlusObject; msg : TCPlusObject; deep : boolean) : Status_t; cdecl; external BePascalLibName name 'BTabView_Archive';
-function BTabView_Perform(AObject : TCPlusObject; d : Perform_code; arg : Pointer) : Status_t; cdecl; external BePascalLibName name 'BTabView_Perform';
 procedure BTabView_WindowActivated(AObject : TCPlusObject; state : boolean); cdecl; external BePascalLibName name 'BTabView_WindowActivated';
 procedure BTabView_AttachedToWindow(AObject : TCPlusObject); cdecl; external BePascalLibName name 'BTabView_AttachedToWindow';
 procedure BTabView_AllAttached(AObject : TCPlusObject); cdecl; external BePascalLibName name 'BTabView_AllAttached';
@@ -213,11 +209,6 @@ end;
 function BTab.Archive(data : BMessage; deep : boolean) : Status_t;
 begin
   Result := BTab_Archive(CPlusObject, data.CPlusObject, deep);
-end;
-
-function BTab.Perform(d : Cardinal; arg : Pointer) : Status_t;
-begin
-  Result := BTab_Perform(CPlusObject, d, arg);
 end;
 
 function BTab.GetLabel : PChar;
@@ -320,11 +311,6 @@ end;
 function BTabView.Archive( msg : BMessage; deep : boolean) : Status_t;
 begin
   Result := BTabView_Archive(CPlusObject, msg.CPlusObject, deep);
-end;
-
-function BTabView.Perform(d : Perform_code; arg : Pointer) : Status_t;
-begin
- // Result := BTabView_Perform(CPlusObject, d, arg);
 end;
 
 procedure BTabView.WindowActivated(state : boolean);

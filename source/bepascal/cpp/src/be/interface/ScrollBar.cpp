@@ -612,20 +612,6 @@ BScrollBar_GetSupportedSuites(BScrollBar *ScrollBar, BMessage *data)
 }
 
 
-/***********************************************************************
- *  Method: BScrollBar::Perform
- *  Params: perform_code d, void *arg
- * Returns: status_t
- * Effects: 
- ***********************************************************************/
-status_t
-BScrollBar_Perform(BScrollBar *ScrollBar, perform_code d, void *arg)
-{
-   return ScrollBar->Perform(d, arg);
-}
-
-
-
 
 #if defined(__cplusplus)
 }

@@ -1164,19 +1164,6 @@ BWindow_RemoveFromSubset(BWindow *Window, BWindow *window)
 
 
 /***********************************************************************
- *  Method: BWindow::Perform
- *  Params: perform_code d, void *arg
- * Returns: status_t
- * Effects: 
- ***********************************************************************/
-status_t
-BWindow_Perform(BWindow *Window, perform_code d, void *arg)
-{
-   return Window->Perform(d, arg);
-}
-
-
-/***********************************************************************
  *  Method: BWindow::SetType
  *  Params: window_type type
  * Returns: status_t

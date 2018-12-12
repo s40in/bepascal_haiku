@@ -42,7 +42,7 @@ type
     procedure SetWidth(awidth : double);
     procedure DrawItem(owner : BView; bounds : BRect; complete : boolean);
     procedure Update(owner : BView; font :  BFont);
- //   function Perform(d : TPerform_code; var arg : Pointer) : Status_t;
+
     function IsExpanded : boolean;
     procedure SetExpanded(expanded : boolean);
     function OutlineLevel : Cardinal;
@@ -62,7 +62,6 @@ type
     procedure SetText( atext : PChar);
     function Text : PChar;
     procedure Update(owner : BView; font :  BFont);
-//    function Perform(d : TPerform_code; arg : Pointer) : Status_t;
   end;
 
 function BListItem_Create(AObject : TBeObject;outlineLevel : longint; expanded : boolean): TCPlusObject; cdecl; external BePascalLibName name 'BListItem_Create';
@@ -79,7 +78,6 @@ function BListItem_IsEnabled(AObject : TCPlusObject) : boolean; cdecl; external 
 procedure BListItem_SetHeight(AObject : TCPlusObject; aheight : double); cdecl; external BePascalLibName name 'BListItem_SetHeight';
 procedure BListItem_SetWidth(AObject : TCPlusObject; awidth : double); cdecl; external BePascalLibName name 'BListItem_SetWidth';
 procedure BListItem_Update(AObject : TCPlusObject; owner : TCPlusObject; font :  TCPlusObject); cdecl; external BePascalLibName name 'BListItem_Update';
-function BListItem_Perform(AObject : TCPlusObject; d : TCPlusObject; arg : Pointer) : Status_t; cdecl; external BePascalLibName name 'BListItem_Perform';
 function BListItem_IsExpanded(AObject : TCPlusObject) : boolean; cdecl; external BePascalLibName name 'BListItem_IsExpanded';
 procedure BListItem_SetExpanded(AObject : TCPlusObject; expanded : boolean); cdecl; external BePascalLibName name 'BListItem_SetExpanded';
 function BListItem_OutlineLevel(AObject : TCPlusObject) : Cardinal; cdecl; external BePascalLibName name 'BListItem_OutlineLevel';
@@ -96,7 +94,6 @@ procedure BStringItem_DrawItem(AObject : TCPlusObject; owner : TCPlusObject; fra
 procedure BStringItem_SetText(AObject : TCPlusObject; text : PChar); cdecl; external BePascalLibName name 'BStringItem_SetText';
 function BStringItem_Text(AObject : TCPlusObject) : PChar; cdecl; external BePascalLibName name 'BStringItem_Text';
 procedure BStringItem_Update(AObject : TCPlusObject; owner : TCPlusObject; font :  TCPlusObject); cdecl; external BePascalLibName name 'BStringItem_Update';
-function BStringItem_Perform(AObject : TCPlusObject; d : Perform_code; arg : Pointer) : Status_t; cdecl; external BePascalLibName name 'BStringItem_Perform';
 
 implementation
 
@@ -185,11 +182,6 @@ begin
  // BListItem_Update(CPlusObject, owner.CPlusObject, font);
 end;
 
-{function BListItem.Perform(d : TPerform_code; var arg : Pointer) : Status_t;
-begin
-  Result := BListItem_Perform(CPlusObject, d, arg);
-end;
-}
 function BListItem.IsExpanded : boolean;
 begin
   Result := BListItem_IsExpanded(CPlusObject);
@@ -264,11 +256,6 @@ begin
   //BStringItem_Update(CPlusObject, owner.CPlusObject, font);
 end;
 
-{function BStringItem.Perform(d : TPerform_code; arg : Pointer) : Status_t;
-begin
-  Result := BStringItem_Perform(CPlusObject, d, arg);
-end;
-}
 
 procedure ListItem_DrawItem_hook_func(Liste : BListItem;owner : TCPlusObject; bounds : TCPlusObject; complete : boolean); cdecl;
 var Rect : BRect;

@@ -586,18 +586,6 @@ BButton_GetSupportedSuites(BButton *Button, BMessage *data)
 }
 
 
-/***********************************************************************
- *  Method: BButton::Perform
- *  Params: perform_code d, void *arg
- * Returns: status_t
- * Effects: 
- ***********************************************************************/
-status_t
-BButton_Perform(BButton *Button, perform_code d, void *arg)
-{
-   return Button->Perform(d, arg);
-}
-
 
 /***********************************************************************
  *  Method: BButton::_ReservedButton1

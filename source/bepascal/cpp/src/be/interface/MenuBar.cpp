@@ -479,18 +479,6 @@ BMenuBar_AllDetached(BMenuBar *MenuBar)
 }
 
 
-/***********************************************************************
- *  Method: BMenuBar::Perform
- *  Params: perform_code d, void *arg
- * Returns: status_t
- * Effects: 
- ***********************************************************************/
-status_t
-BMenuBar_Perform(BMenuBar *MenuBar, perform_code d, void *arg)
-{
-   return MenuBar->Perform(d, arg);
-}
-
 
 /***********************************************************************
  *  Method: BMenuBar::_ReservedMenuBar1

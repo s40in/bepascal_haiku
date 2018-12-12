@@ -28,8 +28,8 @@ type
   BRadioButton = class(BControl)
   public
 	constructor Create(aframe : BRect; name, aLabel : PChar; message : BMessage;
-	                   resizingMode_ : Longword {$ifndef VER1_0}= B_FOLLOW_LEFT or B_FOLLOW_TOP{$endif};
-	                   flags : Longword {$ifndef VER1_0}= B_WILL_DRAW or B_NAVIGABLE{$endif}); virtual;
+	                   resizingMode_ : Longword ;
+	                   flags : Longword ); virtual;
     constructor Create(data : BMessage); override;
     destructor Destroy; override;
     function Instantiate(data : BMessage) : BArchivable;
@@ -56,7 +56,7 @@ type
     procedure AllAttached; override;
     procedure AllDetached; override;
     function GetSupportedSuites(data : BMessage) : status_t;
-    function Perform(d : Perform_code; arg : Pointer) : status_t;
+
   end;
 
 function BRadioButton_Create(AObject : TBeObject; frame : TCPlusObject;
@@ -118,8 +118,6 @@ procedure BRadioButton_AllDetached(AObject : TCPlusObject);
           cdecl; external BePascalLibName name 'BRadioButton_AllDetached';
 function BRadioButton_GetSupportedSuites(AObject : TCPlusObject; data : TCPlusObject)
          : status_t; cdecl; external BePascalLibName name 'BRadioButton_GetSupportedSuites';
-function BRadioButton_Perform(AObject : TCPlusObject; d : perform_code; arg : Pointer) : status_t;
-         cdecl; external BePascalLibName name 'BRadioButton_Perform';
 
 implementation
 
@@ -256,9 +254,5 @@ begin
   Result := BRadioButton_GetSupportedSuites(CPlusObject, data.CPlusObject);
 end;
 
-function  BRadioButton.Perform(d : Perform_code; arg : Pointer) : status_t;
-begin
-  Result := BRadioButton_Perform(CPlusObject, d, arg);
-end;
 
 end.

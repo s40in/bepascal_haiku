@@ -69,7 +69,6 @@ type
     procedure MessageReceived(message : BMessage);override;
     function ResolveSpecifier(message : BMessage; index : integer; specifier : BMessage; form : integer; properti : PChar) : BHandler;
     function GetSupportedSuites(data : BMessage) : Status_t;
-    function Perform(d : Perform_code; arg : Pointer) : Status_t;
     procedure SetText(inText : PChar; var inRuns :  text_run_array);
     procedure SetText(inText : PChar; inLength : integer; var inRuns :  text_run_array);
 //    procedure SetText(inFile : TFile; startOffset : integer; inLength : integer; var inRuns :  text_run_array);
@@ -177,7 +176,6 @@ procedure BTextView_MakeFocus(AObject : TCPlusObject; focusState : boolean); cde
 procedure BTextView_MessageReceived(AObject : TCPlusObject; message : TCPlusObject); cdecl; external BePascalLibName name 'BTextView_MessageReceived';
 function BTextView_ResolveSpecifier(AObject : TCPlusObject; message : TCPlusObject; index : integer; specifier : TCPlusObject; form : integer; properti : PChar) : BHandler; cdecl; external BePascalLibName name 'BTextView_ResolveSpecifier';
 function BTextView_GetSupportedSuites(AObject : TCPlusObject; data : TCPlusObject) : Status_t; cdecl; external BePascalLibName name 'BTextView_GetSupportedSuites';
-function BTextView_Perform(AObject : TCPlusObject; d : Perform_code; arg : Pointer) : Status_t; cdecl; external BePascalLibName name 'BTextView_Perform';
 procedure BTextView_SetText(AObject : TCPlusObject; inText : PChar;var inRuns :  text_run_array); cdecl; external BePascalLibName name 'BTextView_SetText';
 procedure BTextView_SetText(AObject : TCPlusObject; inText : PChar; inLength : integer;var inRuns :  text_run_array); cdecl; external BePascalLibName name 'BTextView_SetText_1';
 //procedure BTextView_SetText(AObject : TCPlusObject; inFile : TFile; startOffset : integer; inLength : integer; inRuns :  Ttext_tun_array); cdecl; external BePascalLibName name 'BTextView_SetText';
@@ -290,8 +288,6 @@ procedure BTextView_DrawCaret(AObject : TCPlusObject; offset : integer); cdecl; 
 procedure BTextView_InvertCaret(AObject : TCPlusObject); cdecl; external BePascalLibName name 'BTextView_InvertCaret';
 procedure BTextView_DragCaret(AObject : TCPlusObject; offset : integer); cdecl; external BePascalLibName name 'BTextView_DragCaret';
 procedure BTextView_StopMouseTracking(AObject : TCPlusObject); cdecl; external BePascalLibName name 'BTextView_StopMouseTracking';
-function BTextView_PerformMouseUp(AObject : TCPlusObject; where : BPoint) : boolean; cdecl; external BePascalLibName name 'BTextView_PerformMouseUp';
-function BTextView_PerformMouseMoved(AObject : TCPlusObject; where : BPoint; code : Cardinal) : boolean; cdecl; external BePascalLibName name 'BTextView_PerformMouseMoved';
 procedure BTextView_TrackMouse(AObject : TCPlusObject; where : BPoint; message : BMessage; force : boolean); cdecl; external BePascalLibName name 'BTextView_TrackMouse';
 procedure BTextView_TrackDrag(AObject : TCPlusObject; where : BPoint); cdecl; external BePascalLibName name 'BTextView_TrackDrag';
 procedure BTextView_InitiateDrag(AObject : TCPlusObject); cdecl; external BePascalLibName name 'BTextView_InitiateDrag';
@@ -418,10 +414,6 @@ begin
   Result := BTextView_GetSupportedSuites(CPlusObject, data.CPlusObject);
 end;
 
-function  BTextView.Perform(d : Perform_code; arg : Pointer) : Status_t;
-begin
-  Result := BTextView_Perform(CPlusObject, d, arg);
-end;
 
 procedure  BTextView.SetText(inText : PChar; var inRuns :  text_run_array);
 begin

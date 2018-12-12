@@ -40,7 +40,6 @@ type
     function Instantiate(data : BMessage) : BArchivable;
     function Archive(data : BMessage; deep : boolean) : Status_t;
 
-    function Perform(d : Perform_code; arg : Pointer) : Status_t;
     function Flatten(var stream : BDataIO) : Status_t;
     function Unflatten(var stream : BDataIO) : Status_t;
   end;
@@ -52,7 +51,6 @@ function BPicture_Create(AObject : TCPlusObject;data : BMessage) : TCPlusObject;
 procedure BPicture_Free(AObject : TCPlusObject); cdecl;  external BePascalLibName name 'BPicture_Free';
 function BPicture_Instantiate(AObject : TCPlusObject; data : TCPlusObject)  : BArchivable; cdecl; external BePascalLibName name 'BPicture_Instantiate';
 function BPicture_Archive(AObject : TCPlusObject; data : TCPlusObject;  deep : boolean) : Status_t; cdecl;  external BePascalLibName name 'BPicture_Archive';
-function BPicture_Perform(AObject : TCPlusObject; d : Perform_code; arg : Pointer) :  Status_t; cdecl; external BePascalLibName name 'BPicture_Perform';
 function BPicture_Flatten(AObject : TCPlusObject;  stream : TCPlusObject) : Status_t; cdecl;  external BePascalLibName name 'BPicture_Flatten';
 function BPicture_Unflatten(AObject : TCPlusObject; stream : TCPlusObject) :  Status_t; cdecl; external BePascalLibName name 'BPicture_Unflatten';
 
@@ -92,11 +90,6 @@ begin
 end;
 
 
-
-function BPicture.Perform(d : Perform_code; arg : Pointer) : Status_t;
-begin
-  Result := BPicture_Perform(CPlusObject, d, arg);
-end;
 
 function BPicture.Flatten(var stream : BDataIO) : Status_t;
 begin

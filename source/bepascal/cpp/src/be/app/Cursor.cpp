@@ -125,19 +125,7 @@ BCursor_Instantiate(BCursor *Cursor, BMessage *data)
 }
 
 
-/***********************************************************************
- *  Method: BCursor::Perform
- *  Params: perform_code d, void *arg
- * Returns: status_t
- * Effects: 
- ***********************************************************************/
-#ifndef __HAIKU__
-status_t
-BCursor_Perform(BCursor *Cursor, perform_code d, void *arg)
-{
-   return Cursor->Perform(d, arg);
-}
-#endif
+
 
 
 #if defined(__cplusplus)

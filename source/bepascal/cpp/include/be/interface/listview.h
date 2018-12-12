@@ -57,7 +57,6 @@ virtual	void			AttachedToWindow();
 										int32 form,
 										const char *property);*/
 
-//virtual status_t		Perform(perform_code d, void *arg);
 
 virtual void			WindowActivated(bool state);
 virtual	void			MouseUp(BPoint pt);

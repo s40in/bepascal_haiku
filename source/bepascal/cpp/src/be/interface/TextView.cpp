@@ -81,7 +81,6 @@ virtual	void			MessageReceived(BMessage *message);
 										 int32 form,
 										 const char *property);*/
 //virtual status_t		GetSupportedSuites(BMessage *data);
-//virtual status_t		Perform(perform_code d, void *arg);
 	
 		void			SetText(const char *inText, 
 								const text_run_array *inRuns = NULL);
@@ -614,18 +613,6 @@ BTextView_GetSupportedSuites(BTextView *TextView, BMessage *data)
    return TextView->GetSupportedSuites(data);
 }
 
-
-/***********************************************************************
- *  Method: BTextView::Perform
- *  Params: perform_code d, void *arg
- * Returns: status_t
- * Effects: 
- ***********************************************************************/
-status_t
-BTextView_Perform(BTextView *TextView, perform_code d, void *arg)
-{
-   return TextView->Perform(d, arg);
-}
 
 
 /***********************************************************************

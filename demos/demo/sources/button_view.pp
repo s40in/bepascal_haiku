@@ -29,7 +29,7 @@ uses
 type 
 	TButton_View = class(BView)
 	public
-   	constructor Create(aframe : BRect; name : PChar; aresizingMode, flags : Cardinal); 
+   
    	Button1: BButton;    
    	Button2: BButton;    
    	Button3: BButton;    
@@ -39,6 +39,7 @@ type
  		outlineListView : BOutlineListView;
  		Box1 : BBox;
  		Box2 : BBox;
+ 	constructor Create(aframe : BRect; name : PChar; aresizingMode, flags : Cardinal); 	
 
   end;
 

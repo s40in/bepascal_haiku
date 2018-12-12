@@ -431,18 +431,6 @@ BControl_AllDetached(BControl *Control)
 }
 
 
-/*
- *  Method: BControl::Perform()
- *   Descr: 
- */
-status_t
-BControl_Perform(BControl *Control, perform_code d,
-                  void *arg)
-{
-   return Control->Perform(d,
-                  arg);
-}
-
 
 /*
  *  Method: BControl::IsFocusChanging()

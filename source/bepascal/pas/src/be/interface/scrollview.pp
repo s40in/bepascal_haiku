@@ -62,7 +62,6 @@ type
     procedure GetPreferredSize(width : double; height : double);
     procedure MakeFocus(state : boolean);
     function GetSupportedSuites(data : BMessage) : Status_t;
-    function Perform(d : Perform_code; arg : Pointer) : Status_t;
   end;
 
 function BScrollView_Create(AObject : TBeObject;name : pchar;target :TCPlusObject; resizeMask : longint;	flags : longint;horizontal,vertical : boolean;border :border_style ):TCPlusObject; cdecl; external BePascalLibName name 'BScrollView_Create';
@@ -94,7 +93,6 @@ procedure BScrollView_ResizeToPreferred(AObject : TCPlusObject); cdecl; external
 procedure BScrollView_GetPreferredSize(AObject : TCPlusObject; width : double; height : double); cdecl; external BePascalLibName name 'BScrollView_GetPreferredSize';
 procedure BScrollView_MakeFocus(AObject : TCPlusObject; state : boolean); cdecl; external BePascalLibName name 'BScrollView_MakeFocus';
 function BScrollView_GetSupportedSuites(AObject : TCPlusObject; data : TCPlusObject) : Status_t; cdecl; external BePascalLibName name 'BScrollView_GetSupportedSuites';
-function BScrollView_Perform(AObject : TCPlusObject; d : Perform_code; arg : Pointer) : Status_t; cdecl; external BePascalLibName name 'BScrollView_Perform';
 
 implementation
 
@@ -248,11 +246,6 @@ end;
 function BScrollView.GetSupportedSuites(data : BMessage) : Status_t;
 begin
   Result := BScrollView_GetSupportedSuites(CPlusObject, data.CPlusObject);
-end;
-
-function BScrollView.Perform(d : Perform_code; arg : Pointer) : Status_t;
-begin
-  Result := BScrollView_Perform(CPlusObject, d, arg);
 end;
 
 

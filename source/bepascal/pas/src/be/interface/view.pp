@@ -497,7 +497,6 @@ type
     procedure Unlock;
     function IsLocked : Boolean;
 
-    function Perform(d : perform_code; arg : Pointer) : status_t;
   end;
 
 function BBitmap_Create(AObject : TBeObject; frame : TCPlusObject;
@@ -592,9 +591,6 @@ procedure BBitmap_Unlock(AObject : TCPlusObject);
 
 function BBitmap_IsLocked(AObject : TCPlusObject) : Boolean;
          cdecl; external BePascalLibName name 'BBitmap_IsLocked';
-
-function BBitmap_Perform(AObject : TCPlusObject; d : perform_code; arg : Pointer)
-         :  status_t; cdecl; external BePascalLibName name 'BBitmap_Perform';
 
    
 implementation
@@ -1859,10 +1855,6 @@ begin
   Result := BBitmap_IsLocked(CPlusObject);
 end;
 
-function BBitmap.Perform(d : perform_code; arg : Pointer) : status_t;
-begin
-  Result := BBitmap_Perform(CPlusObject, d, arg);
-end;
 
 
 

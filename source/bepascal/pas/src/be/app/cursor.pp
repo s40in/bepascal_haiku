@@ -39,7 +39,7 @@ type
     function Instantiate(data : BMessage) : BArchivable;
     function Archive(data : BMessage; deep : boolean) : Status_t;
 
-    function Perform(d : Perform_code; arg : Pointer) : Status_t;
+
   end;
 
 function BCursor_Create(AObject : TCPlusObject;cursorData : pointer) : TCPlusObject; cdecl;  external BePascalLibName name 'BCursor_Create';
@@ -49,7 +49,6 @@ function BCursor_Create(AObject : TCPlusObject;data : BMessage) : TCPlusObject; 
 procedure BCursor_Free(AObject : TCPlusObject); cdecl;  external BePascalLibName name 'BCursor_Free';
 function BCursor_Instantiate(AObject : TCPlusObject; data : TCPlusObject)  : BArchivable; cdecl; external BePascalLibName name 'BCursor_Instantiate';
 function BCursor_Archive(AObject : TCPlusObject; data : TCPlusObject;  deep : boolean) : Status_t; cdecl;  external BePascalLibName name 'BCursor_Archive';
-function BCursor_Perform(AObject : TCPlusObject; d : Perform_code; arg : Pointer) :  Status_t; cdecl; external BePascalLibName name 'BCursor_Perform';
 
 
 
@@ -87,11 +86,6 @@ begin
 end;
 
 
-
-function BCursor.Perform(d : Perform_code; arg : Pointer) : Status_t;
-begin
-  Result := BCursor_Perform(CPlusObject, d, arg);
-end;
 
 
 

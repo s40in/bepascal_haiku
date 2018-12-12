@@ -56,7 +56,6 @@ type
     procedure AllDetached; override;
     function ResolveSpecifier(msg : BMessage; index : integer; specifier : BMessage; form : integer; properti : PChar) : BHandler;
     function GetSupportedSuites(data : BMessage) : Status_t;
-    function Perform(d : Perform_code; arg : Pointer) : Status_t;
 //    procedure _ReservedButton1;
 //    procedure _ReservedButton2;
 //    procedure _ReservedButton3;
@@ -97,7 +96,6 @@ procedure BButton_AllAttached(AObject : TCPlusObject); cdecl; external BePascalL
 procedure BButton_AllDetached(AObject : TCPlusObject); cdecl; external BePascalLibName name 'BButton_AllDetached';
 function BButton_ResolveSpecifier(AObject : TCPlusObject; msg : TCPlusObject; index : integer; specifier : TCPlusObject; form : integer; properti : PChar) : BHandler; cdecl; external BePascalLibName name 'BButton_ResolveSpecifier';
 function BButton_GetSupportedSuites(AObject : TCPlusObject; data : TCPlusObject) : Status_t; cdecl; external BePascalLibName name 'BButton_GetSupportedSuites';
-function BButton_Perform(AObject : TCPlusObject; d : Perform_code; arg : Pointer) : Status_t; cdecl; external BePascalLibName name 'BButton_Perform';
 
 implementation
 
@@ -247,10 +245,6 @@ begin
   Result := BButton_GetSupportedSuites(CPlusObject, data.CPlusObject);
 end;
 
-function BButton.Perform(d : Perform_code; arg : Pointer) : Status_t;
-begin
-  Result := BButton_Perform(CPlusObject, d, arg);
-end;
 
 
 procedure Button_MakeDefault_hook_func(Button : BButton; flag : boolean); cdecl;

@@ -57,7 +57,6 @@ type
     function GetSupportedSuites(data : BMessage) : Status_t;
     procedure AllAttached; override;
     procedure AllDetached; override;
-    function Perform(d : Perform_code; arg : Pointer) : Status_t;
     property Invoker : BInvoker read GeBInvoker;
   end;
 
@@ -89,7 +88,6 @@ function BControl_ResolveSpecifier(AObject : TCPlusObject; msg : TCplusObject; i
 function BControl_GetSupportedSuites(AObject : TCPlusObject; data : TCplusObject) : Status_t; cdecl; external BePascalLibName name 'BControl_GetSupportedSuites';
 procedure BControl_AllAttached(AObject : TCPlusObject); cdecl; external BePascalLibName name 'BControl_AllAttached';
 procedure BControl_AllDetached(AObject : TCPlusObject); cdecl; external BePascalLibName name 'BControl_AllDetached';
-function BControl_Perform(AObject : TCPlusObject; d : Perform_code; arg : Pointer) : Status_t; cdecl; external BePascalLibName name 'BControl_Perform';
 procedure BControl_InitData(AObject : TCPlusObject; data : TCplusObject); cdecl; external BePascalLibName name 'BControl_InitData';
 
 implementation
@@ -229,11 +227,6 @@ end;
 procedure BControl.AllDetached;
 begin
 //  BControl_AllDetached(CPlusObject);
-end;
-
-function BControl.Perform(d : Perform_code; arg : Pointer) : Status_t;
-begin
-  Result := bControl_Perform(CPlusObject, d, arg);
 end;
 
 //function BControl.IsFocusChanging : boolean;

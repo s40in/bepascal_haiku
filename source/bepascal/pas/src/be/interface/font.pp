@@ -335,19 +335,19 @@ var
 function count_font_families : Longint;
          cdecl; external 'be' name 'count_font_families__Fv';
 function get_font_family(index : Longint; var name : font_family;
-                         var flags : Longword {$ifndef VER1_0}= nil{$endif})
+                         var flags : Longword )
          : status_t; cdecl; external 'be' name 'get_font_family__FlPA64_cPUl';
 
 function count_font_styles(name : font_family) : Longint;
          cdecl; external 'be' name 'count_font_styles__FPc';
 
 function get_font_style(family : font_family; index : Longint;
-                        var name : font_style; var flags : Longword {$ifndef VER1_0}= nil{$endif})
+                        var name : font_style; var flags : Longword)
          : status_t; cdecl; external 'be' name 'get_font_style__FPclPA64_cPUl';
 
 function get_font_style(family : font_family; index : Longint;
                         var name : font_style; var face : Word;
-                        var flags : Longword {$ifndef VER1_0}= nil{$endif})
+                        var flags : Longword )
          : status_t; cdecl; external 'be' name 'get_font_style__FPclPA64_cPUsPUl';
 
 function update_font_families(check_only : Boolean) : Boolean;

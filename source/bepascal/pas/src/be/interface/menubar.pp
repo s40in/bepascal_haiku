@@ -211,10 +211,7 @@ begin
 //  BMenuBar_AllDetached(CPlusObject);
 end;
 
-{function BMenuBar.Perform(d : TPerform_code; arg : Pointer) : Status_t;
-begin
-  Result := BMenuBar_Perform(CPlusObject, d, arg);
-end;
+{
 
 procedure BMenuBar._ReservedMenuBar1;
 begin

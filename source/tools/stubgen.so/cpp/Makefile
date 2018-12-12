@@ -62,6 +62,7 @@ CFLAGS = -g -DSGDEBUG
 OFILES = y.tab.o lex.yy.o table.o util.o pathname.o main.o getopt.o
 SRCFILES = lexer.l parser.y table.[ch] util.[ch] pathname.[ch] main.c
 
+
 all:	stubgen
 
 stubgen:	$(OFILES)

@@ -318,18 +318,6 @@ BListItem_Update(BListItem *ListItem, BView *owner, const BFont *font)
 }
 
 
-/***********************************************************************
- *  Method: BListItem::Perform
- *  Params: perform_code d, void *arg
- * Returns: status_t
- * Effects: 
- ***********************************************************************/
-status_t
-BListItem_Perform(BListItem *ListItem, perform_code d, void *arg)
-{
-   return ListItem->Perform(d, arg);
-}
-
 
 /***********************************************************************
  *  Method: BListItem::IsExpanded
@@ -480,18 +468,6 @@ BStringItem_Update(BStringItem *StringItem, BView *owner, const BFont *font)
    StringItem->Update(owner, font);
 }
 
-
-/***********************************************************************
- *  Method: BStringItem::Perform
- *  Params: perform_code d, void *arg
- * Returns: status_t
- * Effects: 
- ***********************************************************************/
-status_t
-BStringItem_Perform(BStringItem *StringItem, perform_code d, void *arg)
-{
-   return StringItem->Perform(d, arg);
-}
 
 
 

@@ -105,7 +105,6 @@ virtual void			AllDetached();
 
 
 /*----- Private or reserved -----------------------------------------*/
-//virtual status_t		Perform(perform_code d, void *arg);
 
 private:
 };
@@ -696,19 +695,6 @@ BTextControl_SetFlags(BTextControl *TextControl, uint32 flags)
 }
 
 
-/***********************************************************************
- *  Method: BTextControl::Perform
- *  Params: perform_code d, void *arg
- * Returns: status_t
- * Effects: 
- ***********************************************************************/
-#ifndef __HAIKU__
-status_t
-BTextControl_Perform(BTextControl *TextControl, perform_code d, void *arg)
-{
-   return TextControl->Perform(d, arg);
-}
-#endif
 
 /***********************************************************************
  *  Method: BTextControl::_ReservedTextControl1

@@ -89,7 +89,7 @@ public:
 
 
 /*----- Private or reserved -----------------------------------------*/
-//virtual status_t		Perform(perform_code d, void *arg);
+
 
 private:
 	/*friend	status_t		_init_interface_kit_();
@@ -567,19 +567,6 @@ status_t
 BRadioButton_GetSupportedSuites(BRadioButton *RadioButton, BMessage *data)
 {
    return RadioButton->GetSupportedSuites(data);
-}
-
-
-/***********************************************************************
- *  Method: BRadioButton::Perform
- *  Params: perform_code d, void *arg
- * Returns: status_t
- * Effects: 
- ***********************************************************************/
-status_t
-BRadioButton_Perform(BRadioButton *RadioButton, perform_code d, void *arg)
-{
-   return RadioButton->Perform(d, arg);
 }
 
 
